@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bbqthingbase01"]
+
+[ext_resource type="Script" path="res://template/Thing/Thing.cs" id="1_thing_script"]
+
+[node name="Thing" type="Node2D"]
+script = ExtResource("1_thing_script")

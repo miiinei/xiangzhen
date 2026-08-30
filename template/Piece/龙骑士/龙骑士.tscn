@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://cjy00dxvo8bd8"]
+
+[ext_resource type="PackedScene" uid="uid://b545b8l5gv6q1" path="res://template/Piece/Piece.tscn" id="1_3x4i9"]
+[ext_resource type="Script" uid="uid://dta7gtst3i1" path="res://template/Piece/龙骑士/龙骑士.cs" id="2_0nbx6"]
+[ext_resource type="PackedScene" uid="uid://bjlg0h4c2qei4" path="res://template/Skill/动能炮/动能炮.tscn" id="3_3kxvq"]
+[ext_resource type="Texture2D" uid="uid://bpvjvp0rx55jl" path="res://template/Piece/MechBreath.png" id="3_hxtr5"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1"]
+atlas = ExtResource("3_hxtr5")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2"]
+atlas = ExtResource("3_hxtr5")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3"]
+atlas = ExtResource("3_hxtr5")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4"]
+atlas = ExtResource("3_hxtr5")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_r8h8j"]
+resource_local_to_scene = true
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4")
+}],
+"loop": true,
+"name": &"default",
+"speed": 4.0
+}]
+
+[node name="龙骑士" unique_id=1455792744 instance=ExtResource("1_3x4i9")]
+script = ExtResource("2_0nbx6")
+Skill1Scene = ExtResource("3_3kxvq")
+Skill4Scene = ExtResource("3_3kxvq")
+
+[node name="AnimatedSprite2D" parent="." index="0" unique_id=331648710]
+sprite_frames = SubResource("SpriteFrames_r8h8j")

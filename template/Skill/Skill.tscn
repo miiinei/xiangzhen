@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://w1gytdo71btt"]
+
+[ext_resource type="Script" uid="uid://bkxib6lwvdctw" path="res://template/Skill/Skill.cs" id="1"]
+
+[node name="Skill2" type="Control" unique_id=1344401341]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1")
+MultiTarget = true
+
+[node name="Frame" type="Panel" parent="." unique_id=1612463587]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+
+[node name="TextureRect" type="TextureRect" parent="Frame" unique_id=682072254]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+stretch_mode = 1

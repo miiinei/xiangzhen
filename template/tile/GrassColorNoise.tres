@@ -1,0 +1,10 @@
+[gd_resource type="NoiseTexture2D" format=3 uid="uid://c4pw361tusk4s"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_grass_color"]
+noise_type = 2
+frequency = 0.055
+fractal_octaves = 3
+
+[resource]
+noise = SubResource("FastNoiseLite_grass_color")
+seamless = true

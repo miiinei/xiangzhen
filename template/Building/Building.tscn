@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://buildingbase01"]
+
+[ext_resource type="PackedScene" uid="uid://bbqthingbase01" path="res://template/Thing/Thing.tscn" id="1_thing"]
+[ext_resource type="Script" path="res://template/Building/Building.cs" id="2_building_script"]
+
+[node name="Building" instance=ExtResource("1_thing")]
+script = ExtResource("2_building_script")

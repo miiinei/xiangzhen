@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bjlg0h4c2qei4"]
+
+[ext_resource type="PackedScene" uid="uid://w1gytdo71btt" path="res://template/Skill/Skill.tscn" id="1_hxqfw"]
+[ext_resource type="Texture2D" uid="uid://bmt7onm8p8mew" path="res://template/Skill/动能炮/动能炮.png" id="3_ngsxi"]
+
+[node name="Skill" unique_id=24165535 instance=ExtResource("1_hxqfw")]
+IconTexture = ExtResource("3_ngsxi")
+Range = 4
+CanTargetMountain = true
+Straight = true
+MultiTarget = false

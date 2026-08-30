@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://b545b8l5gv6q1"]
+
+[ext_resource type="PackedScene" uid="uid://bbqthingbase01" path="res://template/Thing/Thing.tscn" id="1_thing"]
+[ext_resource type="Script" uid="uid://dxyniewd7t5j2" path="res://template/Piece/Piece.cs" id="2_piece_script"]
+
+[node name="Piece" unique_id=949378834 instance=ExtResource("1_thing")]
+script = ExtResource("2_piece_script")
+ObstacleGroup = 2
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=331648710]
+autoplay = "default"
