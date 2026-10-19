@@ -6,6 +6,8 @@ extends Node
 var actual_seed: int
 var weather_origin: Vector3
 var _templates: Array[ShaderMaterial] = []
+var _sunlight_viewport: SubViewport
+var _sunlight_material: ShaderMaterial
 
 func _enter_tree() -> void:
     var random := RandomNumberGenerator.new()
@@ -23,6 +25,34 @@ func _enter_tree() -> void:
         var material := load(path) as ShaderMaterial
         material.set_shader_parameter("cloud_weather_origin", weather_origin)
         _templates.append(material)
+    _create_sunlight_map()
+
+func _create_sunlight_map() -> void:
+    _sunlight_material = ShaderMaterial.new()
+    _sunlight_material.shader = load("res://shaders/cloud_sunlight.gdshader")
+    for parameter in _sunlight_material.shader.get_shader_uniform_list():
+        var key: StringName = parameter["name"]
+        if key in [&"cloud_sunlight_map", &"cloud_use_sunlight_map"]:
+            continue
+        var value = _templates[0].get_shader_parameter(key)
+        if value != null:
+            _sunlight_material.set_shader_parameter(key, value)
+    _sunlight_viewport = SubViewport.new()
+    _sunlight_viewport.name = "CloudSunlight"
+    _sunlight_viewport.size = Vector2i(256, 256)
+    _sunlight_viewport.disable_3d = true
+    _sunlight_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+    add_child(_sunlight_viewport)
+    var surface := ColorRect.new()
+    surface.size = Vector2(256.0, 256.0)
+    surface.material = _sunlight_material
+    _sunlight_viewport.add_child(surface)
+    for material in _templates:
+        _bind_sunlight_map(material)
+
+func _bind_sunlight_map(material: ShaderMaterial) -> void:
+    material.set_shader_parameter("cloud_sunlight_map", _sunlight_viewport.get_texture())
+    material.set_shader_parameter("cloud_use_sunlight_map", true)
 
 func _ready() -> void:
     # The standalone art preview has inline materials instead of factory copies.
@@ -31,3 +61,4 @@ func _ready() -> void:
         if material != null and material.shader.resource_path in [
                 "res://shaders/cloud_layer.gdshader", "res://shaders/low_poly.gdshader"]:
             material.set_shader_parameter("cloud_weather_origin", weather_origin)
+            _bind_sunlight_map(material)
