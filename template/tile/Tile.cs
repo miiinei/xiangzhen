@@ -18,7 +18,7 @@ public partial class Tile : Node3D
     private static readonly Color TargetPreviewColor = new(1f, 0.2f, 0.2f, 0.32f);
     private static readonly Color MountainColor = new(0.38f, 0.34f, 0.28f);
     private static readonly Color WaterColor = new(0.12f, 0.34f, 0.48f);
-    private static readonly Color GrassColor = new(0.23f, 0.43f, 0.25f);
+    private static readonly Color GrassColor = new(0.48f, 0.68f, 0.28f);
 
     [Export] public Vector2I GridPosition { get; set; }
     [Export] public float HexRadius { get; set; } = DefaultHexRadius;
@@ -115,7 +115,7 @@ public partial class Tile : Node3D
     {
         if (_baseMesh == null) return;
         _baseMesh.Mesh = CreateHexMesh(BaseMeshHeight);
-        _baseMesh.MaterialOverride = StylizedMaterials.Create(GetBaseColor());
+        _baseMesh.MaterialOverride = StylizedMaterials.Create(GetBaseColor(), grass: State == TileState.Grass);
     }
 
     private CylinderMesh CreateHexMesh(float height) => new() { TopRadius = HexRadius, BottomRadius = HexRadius, Height = height, RadialSegments = HexGeometry.EdgeCount, Rings = MeshRingCount };
