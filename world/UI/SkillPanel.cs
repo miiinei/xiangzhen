@@ -3,8 +3,18 @@ using System;
 
 public partial class SkillPanel : Control
 {
+    private const int PanelBorderWidth = 2;
+    private const int SkillSeparation = 8;
+    private const int SkillSlotCount = 4;
+    private static readonly Color PanelBackgroundColor = new(0.12f, 0.12f, 0.12f, 1f);
+    private static readonly Color PanelBorderColor = new(0.32f, 0.32f, 0.32f, 1f);
+    private static readonly NodePath PanelNodePath = "Panel";
+    private static readonly NodePath SkillContainerNodePath = "Panel/MarginContainer/VBoxContainer/SkillIconContainer";
+    private static readonly NodePath TitleLabelNodePath = "Panel/MarginContainer/VBoxContainer/TitleLabel";
+
     public event Action PanelClicked;
     public event Action<bool> ReleaseModeChanged;
+    public event Action TargetingStageChanged;
     private HBoxContainer _skillContainer;
     private Label _titleLabel;
     private PackedScene _defaultSkillScene;
@@ -18,28 +28,28 @@ public partial class SkillPanel : Control
 
     public override void _Ready()
     {
-        var panel = GetNodeOrNull<Panel>("Panel");
-        _skillContainer = GetNodeOrNull<HBoxContainer>("Panel/MarginContainer/VBoxContainer/SkillIconContainer");
-        _titleLabel = GetNodeOrNull<Label>("Panel/MarginContainer/VBoxContainer/TitleLabel");
+        var panel = GetNodeOrNull<Panel>(PanelNodePath);
+        _skillContainer = GetNodeOrNull<HBoxContainer>(SkillContainerNodePath);
+        _titleLabel = GetNodeOrNull<Label>(TitleLabelNodePath);
 
         if (panel != null)
         {
             var style = new StyleBoxFlat();
-            style.BgColor = new Color(0.12f, 0.12f, 0.12f, 1f);
-            style.BorderColor = new Color(0.32f, 0.32f, 0.32f, 1f);
-            style.BorderWidthLeft = 2;
-            style.BorderWidthTop = 2;
-            style.BorderWidthRight = 2;
-            style.BorderWidthBottom = 2;
-            panel.AddThemeStyleboxOverride("panel", style);
-            panel.Modulate = new Color(1f, 1f, 1f, 1f);
+            style.BgColor = PanelBackgroundColor;
+            style.BorderColor = PanelBorderColor;
+            style.BorderWidthLeft = PanelBorderWidth;
+            style.BorderWidthTop = PanelBorderWidth;
+            style.BorderWidthRight = PanelBorderWidth;
+            style.BorderWidthBottom = PanelBorderWidth;
+            panel.AddThemeStyleboxOverride(GodotThemeKeys.Panel, style);
+            panel.Modulate = Colors.White;
         }
 
         if (_skillContainer != null)
         {
-            _skillContainer.AddThemeConstantOverride("separation", 8);
+            _skillContainer.AddThemeConstantOverride(GodotThemeKeys.Separation, SkillSeparation);
         }
-        _defaultSkillScene = GD.Load<PackedScene>("res://template/Skill/skill.tscn");
+        _defaultSkillScene = GD.Load<PackedScene>(ScenePaths.DefaultSkill);
 
         ClearSkills();
         Visible = false;
@@ -106,7 +116,7 @@ public partial class SkillPanel : Control
             piece.Skill4
         };
 
-        for (var i = 0; i < 4; i++)
+        for (var i = 0; i < SkillSlotCount; i++)
         {
             var skill = i < skills.Length ? skills[i] : null;
 
@@ -129,7 +139,9 @@ public partial class SkillPanel : Control
                 skill.GetParent().RemoveChild(skill);
             }
 
-            skill.Name = !skill.IsEmptySlot ? (skill.SkillName ?? $"Skill{i + 1}") : $"EmptySlot{i + 1}";
+            skill.Name = !skill.IsEmptySlot
+                ? skill.SkillName ?? SceneNames.SkillSlot(i + 1, false)
+                : SceneNames.SkillSlot(i + 1, true);
             _skillContainer.AddChild(skill);
             skill.Clicked += OnSkillClicked;
             skill.UpdateVisualState();
@@ -220,6 +232,7 @@ public partial class SkillPanel : Control
 
         if (_activeSkill != null)
         {
+            _activeSkill.CancelChainedTarget();
             try
             {
                 _activeSkill.SetHighlighted(false);
@@ -273,7 +286,14 @@ public partial class SkillPanel : Control
             return false;
         }
 
-        if (tile.State == TileState.Mountain && !_activeSkill.CanTargetMountain)
+        Skill targetingSkill = _activeSkill.TargetingSkill;
+        Tile originTile = _activeSkill.TargetOriginTile;
+        if (originTile == null)
+        {
+            return false;
+        }
+
+        if (tile.State == TileState.Mountain && !targetingSkill.CanTargetMountain)
         {
             return false;
         }
@@ -283,9 +303,9 @@ public partial class SkillPanel : Control
             return false;
         }
 
-        var startPos = _currentPiece.OccupiedTile.GridPosition;
+        var startPos = originTile.GridPosition;
 
-        if (_activeSkill.Straight)
+        if (targetingSkill.Straight)
         {
             if (!World.TryGetHexStraightDirection(startPos, tile.GridPosition, out _))
             {
@@ -293,10 +313,10 @@ public partial class SkillPanel : Control
             }
         }
 
-        if (_activeSkill.Range > 0)
+        if (targetingSkill.Range > 0)
         {
             int distance = World.HexDistance(startPos, tile.GridPosition);
-            if (distance > _activeSkill.Range)
+            if (distance > targetingSkill.Range)
             {
                 return false;
             }
@@ -307,51 +327,21 @@ public partial class SkillPanel : Control
 
     public void OnTileHover(Tile tile)
     {
-        if (_activeSkill == null)
-            return;
+        // Piece owns all 3D targeting visuals.
+    }
 
-        if (!IsValidTarget(tile))
+    public bool StepBackTargeting()
+    {
+        if (_activeSkill == null) return false;
+
+        if (_activeSkill.ReturnToPrimaryTargetStage())
         {
-            ClearStraightHighlights();
-            if (_hoveredTile != null)
-            {
-                try { _hoveredTile.SetSelected(false); } catch { }
-                _hoveredTile = null;
-            }
-            return;
+            TargetingStageChanged?.Invoke();
+            return true;
         }
 
-        if (_hoveredTile == tile)
-            return;
-
-        if (_hoveredTile != null)
-        {
-            try { _hoveredTile.SetSelected(false); } catch { }
-        }
-
-        _hoveredTile = tile;
-        try { _hoveredTile.SetSelected(true); } catch { }
-
-        ClearStraightHighlights();
-
-        if (_activeSkill.Straight && _currentPiece?.OccupiedTile != null && _currentPiece.WorldRef != null)
-        {
-            var startPos = _currentPiece.OccupiedTile.GridPosition;
-            if (World.TryGetHexStraightDirection(startPos, tile.GridPosition, out var dirAxial))
-            {
-                int range = _activeSkill.Range > 0 ? _activeSkill.Range : 1;
-                var linePositions = World.GetHexStraightLine(startPos, dirAxial, range);
-                foreach (var pos in linePositions)
-                {
-                    var lineTile = _currentPiece.WorldRef.GetTile(pos);
-                    if (lineTile != null)
-                    {
-                        lineTile.SetRangeOverlay(true, new Color(1f, 0.2f, 0.2f, 0.35f));
-                        _straightHighlightedTiles.Add(lineTile);
-                    }
-                }
-            }
-        }
+        ClearActiveSkill();
+        return true;
     }
 
     public void OnTileClick(Tile tile)
@@ -362,12 +352,28 @@ public partial class SkillPanel : Control
         if (!IsValidTarget(tile))
             return;
 
-        var multiTarget = _activeSkill.MultiTarget;
         var skillToUse = _activeSkill;
+
+        if (!skillToUse.IsChoosingChainedTarget)
+        {
+            var chainedResult = skillToUse.BeginChainedTarget(tile);
+            if (chainedResult == Skill.ChainedTargetResult.ChoosingChainedTarget)
+            {
+                TargetingStageChanged?.Invoke();
+                return;
+            }
+
+            if (chainedResult == Skill.ChainedTargetResult.ResolvedPrimaryTarget)
+            {
+                skillToUse.SetUsed(true);
+                ClearActiveSkill();
+                return;
+            }
+        }
 
         try
         {
-            skillToUse.Execute(tile);
+            skillToUse.ExecuteTarget(tile);
         }
         catch (Exception ex)
         {
@@ -382,21 +388,7 @@ public partial class SkillPanel : Control
             _hoveredTile = null;
         }
 
-        if (multiTarget)
-        {
-            _multiTargetCount++;
-            // multi-target skills allow exactly 2 targets
-            if (_multiTargetCount >= 2)
-            {
-                skillToUse.SetUsed(true);
-                ClearActiveSkill();
-            }
-        }
-        else
-        {
-            // single-target skills exit after first click
-            skillToUse.SetUsed(true);
-            ClearActiveSkill();
-        }
+        skillToUse.SetUsed(true);
+        ClearActiveSkill();
     }
 }

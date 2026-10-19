@@ -5,7 +5,8 @@
 
 [node name="Skill" unique_id=24165535 instance=ExtResource("1_hxqfw")]
 IconTexture = ExtResource("3_ngsxi")
+Damage = 1
 Range = 4
+KnockBack = 1
 CanTargetMountain = true
 Straight = true
-MultiTarget = false

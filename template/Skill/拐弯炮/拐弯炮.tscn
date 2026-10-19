@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://igcpxr5a5vnn"]
+
+[ext_resource type="PackedScene" uid="uid://w1gytdo71btt" path="res://template/Skill/Skill.tscn" id="1_2goej"]
+[ext_resource type="Texture2D" uid="uid://b1cof3xw7dcmu" path="res://template/Skill/拐弯炮/拐弯炮.png" id="2_2goej"]
+[ext_resource type="PackedScene" uid="uid://3ashxkc2xp2g" path="res://template/Skill/拐弯炮/拐弯炮2.tscn" id="3_2vtab"]
+
+[node name="Skill" unique_id=24165535 instance=ExtResource("1_2goej")]
+IconTexture = ExtResource("2_2goej")
+Damage = 1
+Range = 3
+KnockBack = 1
+CanTargetMountain = true
+Straight = true
+Puncture = true
+MultiTargetSkill = ExtResource("3_2vtab")

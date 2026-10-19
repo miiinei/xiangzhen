@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bdjeeigw5ao4n"]
+
+[ext_resource type="PackedScene" uid="uid://w1gytdo71btt" path="res://template/Skill/Skill.tscn" id="1_5lw6y"]
+
+[node name="Skill" unique_id=24165535 instance=ExtResource("1_5lw6y")]
+Damage = 1
+Range = 4
+KnockBack = 1
+CanTargetMountain = true
+Straight = true

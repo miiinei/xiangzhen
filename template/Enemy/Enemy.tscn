@@ -1,7 +1,19 @@
 [gd_scene format=3 uid="uid://enemybase01"]
 
-[ext_resource type="PackedScene" uid="uid://bbqthingbase01" path="res://template/Thing/Thing.tscn" id="1_thing"]
-[ext_resource type="Script" path="res://template/Enemy/Enemy.cs" id="2_enemy_script"]
+[ext_resource type="PackedScene" uid="uid://b3d3u50uo1d5k" path="res://template/Piece/Piece.tscn" id="1_piece"]
+[ext_resource type="Script" uid="uid://cc5ykndxn7ml0" path="res://template/Enemy/Enemy.cs" id="2_enemy_script"]
+[ext_resource type="PackedScene" uid="uid://igcpxr5a5vnn" path="res://template/Skill/拐弯炮/拐弯炮.tscn" id="3_2vpl3"]
 
-[node name="Enemy" instance=ExtResource("1_thing")]
+[node name="Enemy" unique_id=579732634 instance=ExtResource("1_piece")]
 script = ExtResource("2_enemy_script")
+PlayerTargetScore = 5.0
+FriendlyFireScore = -2.0
+RepeatActionPenalty = -1.5
+ApproachWeight = 0.1
+SuboptimalActionChance = 0.05
+Speed = 5
+Skill1Scene = ExtResource("3_2vpl3")
+MoveGroups = PackedInt32Array(0, 3)
+DefaultBodyColor = Color(0.72, 0.16, 0.14, 1)
+ObstacleGroup = 3
+Faction = 2

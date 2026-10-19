@@ -8,10 +8,14 @@
 
 config_version=5
 
+[accessibility]
+
+general/accessibility_support=false
+
 [application]
 
-config/name="陷阵"
-run/main_scene="uid://bk2lyg07muard"
+config/name="陷阵-editiing"
+run/main_scene="res://world/world.tscn"
 config/features=PackedStringArray("4.6", "C#", "GL Compatibility")
 
 [display]

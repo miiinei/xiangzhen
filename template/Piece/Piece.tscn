@@ -1,11 +1,40 @@
-[gd_scene format=3 uid="uid://b545b8l5gv6q1"]
+[gd_scene format=3 uid="uid://b3d3u50uo1d5k"]
 
-[ext_resource type="PackedScene" uid="uid://bbqthingbase01" path="res://template/Thing/Thing.tscn" id="1_thing"]
-[ext_resource type="Script" uid="uid://dxyniewd7t5j2" path="res://template/Piece/Piece.cs" id="2_piece_script"]
+[ext_resource type="PackedScene" uid="uid://x5m64506yi65" path="res://template/Thing/Thing.tscn" id="1_thing"]
+[ext_resource type="Script" uid="uid://dxyniewd7t5j2" path="res://template/Piece/Piece.cs" id="2_piece"]
+[ext_resource type="PackedScene" uid="uid://b64lbie1tgwpl" path="res://world/UI/SkillPanel.tscn" id="3_3xxq6"]
 
-[node name="Piece" unique_id=949378834 instance=ExtResource("1_thing")]
-script = ExtResource("2_piece_script")
-ObstacleGroup = 2
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.85, 0.45, 0.18, 1)
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=331648710]
-autoplay = "default"
+[sub_resource type="CylinderMesh" id="CylinderMesh_body"]
+top_radius = 0.35
+bottom_radius = 0.45
+height = 0.7
+radial_segments = 6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_path"]
+cull_mode = 2
+shading_mode = 2
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.2, 0.7, 1, 1)
+
+[node name="Piece" unique_id=1806884600 instance=ExtResource("1_thing")]
+script = ExtResource("2_piece")
+Skill1Scene = null
+Skill2Scene = null
+Skill3Scene = null
+Skill4Scene = null
+skillPanel = ExtResource("3_3xxq6")
+MoveRange = 3
+MoveGroups = PackedInt32Array(0, 2)
+PathPreviewWidth = 0.08
+DefaultBodyColor = Color(0.85, 0.45, 0.18, 1)
+
+[node name="BodyMesh" type="MeshInstance3D" parent="." index="0" unique_id=1985743193]
+material_override = SubResource("StandardMaterial3D_body")
+mesh = SubResource("CylinderMesh_body")
+
+[node name="PathPreview" type="MeshInstance3D" parent="." index="1" unique_id=282115199]
+visible = false
+material_override = SubResource("StandardMaterial3D_path")

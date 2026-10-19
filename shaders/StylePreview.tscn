@@ -1,0 +1,58 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Material" path="res://shaders/low_poly.tres" id="1_surface"]
+[ext_resource type="Material" path="res://shaders/cloud_layer.tres" id="2_cloud"]
+[ext_resource type="Shader" path="res://shaders/low_poly.gdshader" id="3_shader"]
+[ext_resource type="Texture2D" path="res://shaders/cloud_noise.tres" id="4_noise"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
+size = Vector2(40, 40)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_piece"]
+top_radius = 1.2
+bottom_radius = 1.6
+height = 3.0
+radial_segments = 6
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_cloud"]
+size = Vector2(100, 100)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_piece"]
+shader = ExtResource("3_shader")
+shader_parameter/base_color = Color(0.85, 0.45, 0.18, 1)
+shader_parameter/cloud_noise = ExtResource("4_noise")
+
+[sub_resource type="Environment" id="Environment_preview"]
+background_mode = 1
+background_color = Color(0.12, 0.17, 0.19, 1)
+
+[node name="StylePreview" type="Node3D"]
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_ground")
+material_override = ExtResource("1_surface")
+
+[node name="Piece" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.5, 0)
+mesh = SubResource("CylinderMesh_piece")
+material_override = SubResource("ShaderMaterial_piece")
+
+[node name="CloudLayer" type="MeshInstance3D" parent="."]
+position = Vector3(0, 7, 0)
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_cloud")
+material_override = ExtResource("2_cloud")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(14, 14, 14)
+rotation_degrees = Vector3(-35.264, 45, 0)
+projection = 1
+size = 22.0
+current = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_preview")

@@ -1,99 +1,28 @@
 using Godot;
 
-public enum TileState
-{
-    Grass = 0,
-    Mountain = 1,
-    Water = 2
-}
+public enum TileState { Grass, Mountain, Water }
 
-public partial class Tile : Area2D
+public partial class Tile : Node3D
 {
-    private static readonly Color NormalBorderColor = new(0.55f, 0.55f, 0.55f, 1f);
-    private static readonly Texture2D MountainTexture = GD.Load<Texture2D>("res://template/tile/Mountain.png");
-    private const int HighlightedZIndex = 100;
-    private const int DefaultZIndex = 0;
+    private const float DefaultHexRadius = 1f;
+    private const float DefaultOutlineWidth = 0.012f;
+    private const float DefaultHighlightWidthScale = 2f;
+    private const string OutlineWidthRangeHint = "0.001,0.2,0.001";
+    private const string HighlightWidthScaleRangeHint = "1.0,10.0,0.1";
+    private const float BaseMeshHeight = 0.16f;
+    private const float TargetPreviewMeshHeight = 0.02f;
+    private const int MeshRingCount = 1;
+    private static readonly NodePath BaseMeshNodePath = "BaseMesh";
+    private static readonly NodePath BaseOutlineNodePath = "BaseOutline";
+    private static readonly NodePath TargetPreviewNodePath = "TargetPreview";
+    private static readonly Color TargetPreviewColor = new(1f, 0.2f, 0.2f, 0.32f);
+    private static readonly Color MountainColor = new(0.38f, 0.34f, 0.28f);
+    private static readonly Color WaterColor = new(0.12f, 0.34f, 0.48f);
+    private static readonly Color GrassColor = new(0.23f, 0.43f, 0.25f);
+
+    [Export] public Vector2I GridPosition { get; set; }
+    [Export] public float HexRadius { get; set; } = DefaultHexRadius;
     private TileState _state;
-    private Camera2D _camera;
-
-    [Export(PropertyHint.Range, "1.0,5.0,0.1")]
-    public float DynamicActivationScale { get; set; } = 2.5f;
-
-    [Export]
-    public Color HighlightBorderColor { get; set; } = new(0.25f, 0.55f, 0.75f, 1f);
-
-    private Polygon2D _rangeOverlay;
-
-    public bool IsDynamicVisible { get; private set; } = true;
-
-    [Export]
-    public int BianChang { get; set; } = 64;
-
-    [Export(PropertyHint.Range, "0.5,1.0,0.01")]
-    public float YCompression { get; set; } = 0.9f;
-
-    [Export(PropertyHint.Range, "20.0,200.0,1.0")]
-    public float GrassWindWaveSpacing { get; set; } = 70f;
-
-    [Export(PropertyHint.Range, "0.1,3.0,0.1")]
-    public float GrassWindSpeed { get; set; } = 1f;
-
-    [Export(PropertyHint.Range, "1.0,8.0,1.0")]
-    public float GrassPixelSize { get; set; } = 3f;
-
-    [Export(PropertyHint.Range, "0.5,20.0,0.5")]
-    public float GrassJitterFrequency { get; set; } = 5f;
-
-    [Export(PropertyHint.Range, "1.0,16.0,1.0")]
-    public float GrassJitterBlockSize { get; set; } = 3f;
-
-    [Export(PropertyHint.Range, "8.0,64.0,1.0")]
-    public float GrassMottledPatchSize { get; set; } = 24f;
-
-    [Export(PropertyHint.Range, "0.0,3.0,0.05")]
-    public float GrassMottledSoftness { get; set; } = 0.35f;
-
-    [Export(PropertyHint.Range, "0.05,6.0,0.05")]
-    public float GrassMottledInvasionFrequency { get; set; } = 1.5f;
-
-    [Export(PropertyHint.Range, "0.0,32.0,0.5")]
-    public float GrassMottledInvasionDepth { get; set; } = 8f;
-
-    [Export]
-    public Color GrassDarkColor { get; set; } = new(0.23f, 0.36f, 0.24f, 1f);
-
-    [Export]
-    public Color GrassBaseColor { get; set; } = new(0.24f, 0.37f, 0.25f, 1f);
-
-    [Export]
-    public Color GrassLightColor { get; set; } = new(0.25f, 0.38f, 0.26f, 1f);
-
-    [Export]
-    public Vector2 GrassWindDirection { get; set; } = new(-1f, 1f);
-
-    [Export(PropertyHint.Range, "0.0,45.0,1.0")]
-    public float GrassWindDivergence { get; set; } = 14f;
-
-    [Export]
-    public CollisionPolygon2D Shape { get; set; }
-
-    [Export]
-    public Line2D SelectionLine { get; set; }
-
-    [Export]
-    public Sprite2D TileSprite { get; set; }
-
-    [Export]
-    public Polygon2D GrassPolygon { get; set; }
-
-    [Export]
-    public Polygon2D WindOverlay { get; set; }
-
-    [Export]
-    public Polygon2D WaterPolygon { get; set; }
-
-    [Export]
-    public Polygon2D WaterOverlay { get; set; }
 
     [Export]
     public TileState State
@@ -102,580 +31,157 @@ public partial class Tile : Area2D
         set
         {
             _state = value;
-            if (IsNodeReady())
-            {
-                UpdateTileVisual();
-            }
+            if (IsNodeReady()) RefreshBaseMesh();
         }
     }
-
-    public int ObstacleGroup { get; private set; }
-
-    [Export]
-    public Vector2I GridPosition { get; set; }
+    [Export(PropertyHint.Range, OutlineWidthRangeHint)] public float OutlineWidth { get; set; } = DefaultOutlineWidth;
+    [Export(PropertyHint.Range, HighlightWidthScaleRangeHint)] public float HighlightWidthScale { get; set; } = DefaultHighlightWidthScale;
     public World WorldRef { get; set; }
-
-    private Piece _occupiedPiece;
-
-    public Piece OccupiedPiece
-    {
-        get => _occupiedPiece;
-        set
-        {
-            _occupiedPiece = value;
-            if (_occupiedPiece != null)
-            {
-                SyncPieceZIndex(ZIndex);
-            }
-            else
-            {
-                ZIndex = DefaultZIndex;
-            }
-        }
-    }
-
-    // Shadows Node2D.ZIndex so the occupying piece is kept exactly 1 above.
-    public new int ZIndex
-    {
-        get => base.ZIndex;
-        set
-        {
-            base.ZIndex = value;
-            SyncPieceZIndex(value);
-        }
-    }
-
-    private void SyncPieceZIndex(int tileZIndex)
-    {
-        if (_occupiedPiece == null)
-        {
-            return;
-        }
-
-        _occupiedPiece.ZIndex = tileZIndex + 1;
-    }
-
-    public bool IsBlocked => ObstacleGroup != 0;
+    public Piece OccupiedPiece { get; set; }
+    public bool IsOccupied => OccupiedPiece != null;
+    public int ObstacleGroup => State == TileState.Mountain ? ObstacleGroups.Mountain : ObstacleGroups.Ground;
+    private static readonly Color NormalOutlineColor = new(0.68f, 0.7f, 0.72f, 0.8f);
+    private static readonly Color HighlightOutlineColor = new(0.2f, 0.7f, 1f, 1f);
+    private MeshInstance3D _baseMesh;
+    private MeshInstance3D _baseOutline;
+    private MeshInstance3D _targetPreview;
+    private readonly bool[] _rangeHighlightedEdges = new bool[HexGeometry.EdgeCount];
+    private bool _isSelected;
 
     public override void _Ready()
     {
-        _camera = GetViewport()?.GetCamera2D();
+        _baseMesh = GetNodeOrNull<MeshInstance3D>(BaseMeshNodePath);
+        _baseOutline = GetNodeOrNull<MeshInstance3D>(BaseOutlineNodePath);
+        _targetPreview = GetNodeOrNull<MeshInstance3D>(TargetPreviewNodePath);
 
-        if (Shape == null)
+        RefreshBaseMesh();
+
+        if (_baseOutline != null)
         {
-            Shape = GetNode<CollisionPolygon2D>("CollisionShape2D");
+            _baseOutline.MaterialOverride = CreateLineMaterial(Colors.White);
+            RefreshBaseOutline();
         }
 
-        if (SelectionLine == null)
+        if (_targetPreview != null)
         {
-            SelectionLine = GetNodeOrNull<Line2D>("SelectionLine");
-        }
-
-        if (TileSprite == null)
-        {
-            TileSprite = GetNodeOrNull<Sprite2D>("Sprite2D");
-        }
-
-        if (GrassPolygon == null)
-        {
-            GrassPolygon = GetNodeOrNull<Polygon2D>("GrassPolygon");
-        }
-
-        if (WindOverlay == null)
-        {
-            WindOverlay = GetNodeOrNull<Polygon2D>("WindOverlay");
-        }
-
-        if (WaterPolygon == null)
-        {
-            WaterPolygon = GetNodeOrNull<Polygon2D>("WaterPolygon");
-        }
-
-        if (WaterOverlay == null)
-        {
-            WaterOverlay = GetNodeOrNull<Polygon2D>("WaterOverlay");
-        }
-
-        var hexagon = BuildRegularHexagon(BianChang, YCompression);
-
-        if (Shape != null)
-        {
-            Shape.Polygon = hexagon;
-        }
-
-        if (GrassPolygon != null)
-        {
-            GrassPolygon.Polygon = hexagon;
-            UpdateGrassWindWaveSpacing();
-            UpdateGrassWindSpeed();
-            UpdateGrassPixelSize();
-            UpdateGrassJitterFrequency();
-            UpdateGrassJitterBlockSize();
-            UpdateGrassMottledPatchSize();
-            UpdateGrassMottledSoftness();
-            UpdateGrassMottledInvasionFrequency();
-            UpdateGrassMottledInvasionDepth();
-            UpdateGrassColors();
-            UpdateGrassWindDirection();
-            UpdateGrassWindDivergence();
-        }
-
-        if (WindOverlay != null)
-        {
-            WindOverlay.Polygon = hexagon;
-        }
-
-        if (WaterPolygon != null)
-        {
-            WaterPolygon.Polygon = hexagon;
-        }
-
-        if (WaterOverlay != null)
-        {
-            WaterOverlay.Polygon = hexagon;
-        }
-
-        UpdateTileVisual();
-        UpdateDynamicVisibility();
-    }
-
-    public override void _Process(double delta)
-    {
-        if (_camera == null)
-        {
-            _camera = GetViewport()?.GetCamera2D();
-        }
-
-        UpdateDynamicVisibility();
-    }
-
-    private void UpdateDynamicVisibility()
-    {
-        if (GetViewport() == null)
-        {
-            SetTileDynamicEnabled(false);
-            return;
-        }
-
-        if (_camera == null)
-        {
-            _camera = GetViewport().GetCamera2D();
-        }
-
-        if (_camera == null)
-        {
-            SetTileDynamicEnabled(false);
-            return;
-        }
-
-        Vector2 zoom = _camera.Zoom;
-        if (zoom.X <= 0f || zoom.Y <= 0f)
-        {
-            SetTileDynamicEnabled(false);
-            return;
-        }
-
-        Rect2 viewportRect = GetViewportRect();
-        Vector2 viewportSize = viewportRect.Size;
-        Vector2 viewportCenter = viewportSize * 0.5f;
-        Vector2 relativeToCamera = GlobalPosition - _camera.GlobalPosition;
-        Vector2 screenPosition = relativeToCamera * zoom + viewportCenter;
-
-        Vector2 activationHalfSize = viewportSize * 0.5f * DynamicActivationScale;
-        Rect2 activationRect = new Rect2(
-            viewportCenter - activationHalfSize,
-            activationHalfSize * 2f
-        );
-
-        SetTileDynamicEnabled(activationRect.HasPoint(screenPosition));
-    }
-
-    private void SetTileDynamicEnabled(bool enabled)
-    {
-        IsDynamicVisible = enabled;
-
-        bool isGrass = State == TileState.Grass;
-        bool isWater = State == TileState.Water;
-
-        if (GrassPolygon != null)
-        {
-            GrassPolygon.Visible = enabled && isGrass;
-        }
-
-        if (WindOverlay != null)
-        {
-            WindOverlay.Visible = enabled && isGrass;
-        }
-
-        if (WaterPolygon != null)
-        {
-            WaterPolygon.Visible = enabled && isWater;
-        }
-
-        if (WaterOverlay != null)
-        {
-            WaterOverlay.Visible = enabled && isWater;
-        }
-
-        SetProcessInput(enabled);
-        SetProcessUnhandledInput(enabled);
-        SetProcessShortcutInput(enabled);
-
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("enable_dynamic", enabled);
-        }
-
-        if (WindOverlay?.Material is ShaderMaterial windMaterial)
-        {
-            windMaterial.SetShaderParameter("enable_dynamic", enabled);
-        }
-
-        if (WaterPolygon?.Material is ShaderMaterial waterMaterial)
-        {
-            waterMaterial.SetShaderParameter("enable_dynamic", enabled);
-        }
-
-        if (WaterOverlay?.Material is ShaderMaterial waterOverlayMaterial)
-        {
-            waterOverlayMaterial.SetShaderParameter("enable_dynamic", enabled);
-        }
-    }
-
-    private void UpdateGrassWindWaveSpacing()
-    {
-        if (GrassPolygon?.Material is not ShaderMaterial grassMaterial)
-        {
-            return;
-        }
-
-        grassMaterial.SetShaderParameter("wind_wave_spacing", GrassWindWaveSpacing);
-
-        if (WindOverlay?.Material is ShaderMaterial windMaterial)
-        {
-            windMaterial.SetShaderParameter("wind_wave_spacing", GrassWindWaveSpacing);
-        }
-
-        if (WaterPolygon?.Material is ShaderMaterial waterMaterial)
-        {
-            waterMaterial.SetShaderParameter("wind_wave_spacing", GrassWindWaveSpacing);
-        }
-
-        if (WaterOverlay?.Material is ShaderMaterial waterOverlayMaterial)
-        {
-            waterOverlayMaterial.SetShaderParameter("wind_wave_spacing", GrassWindWaveSpacing);
-        }
-    }
-
-    private void UpdateGrassWindSpeed()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("wind_speed", GrassWindSpeed);
-        }
-
-        if (WindOverlay?.Material is ShaderMaterial windMaterial)
-        {
-            windMaterial.SetShaderParameter("wind_speed", GrassWindSpeed);
-        }
-
-        if (WaterPolygon?.Material is ShaderMaterial waterMaterial)
-        {
-            waterMaterial.SetShaderParameter("wind_speed", GrassWindSpeed);
-        }
-
-        if (WaterOverlay?.Material is ShaderMaterial waterOverlayMaterial)
-        {
-            waterOverlayMaterial.SetShaderParameter("wind_speed", GrassWindSpeed);
-        }
-    }
-
-    private void UpdateGrassPixelSize()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("pixel_size", GrassPixelSize);
-        }
-
-        if (WaterPolygon?.Material is ShaderMaterial waterMaterial)
-        {
-            waterMaterial.SetShaderParameter("pixel_size", GrassPixelSize);
-        }
-    }
-
-    private void UpdateGrassJitterFrequency()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("jitter_frequency", GrassJitterFrequency);
-        }
-
-        if (WaterPolygon?.Material is ShaderMaterial waterMaterial)
-        {
-            waterMaterial.SetShaderParameter("jitter_frequency", GrassJitterFrequency);
-        }
-    }
-
-    private void UpdateGrassJitterBlockSize()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("jitter_block_size", GrassJitterBlockSize);
-        }
-
-        if (WaterPolygon?.Material is ShaderMaterial waterMaterial)
-        {
-            waterMaterial.SetShaderParameter("jitter_block_size", GrassJitterBlockSize);
-        }
-    }
-
-    private void UpdateGrassMottledPatchSize()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("mottled_patch_size", GrassMottledPatchSize);
-        }
-    }
-
-    private void UpdateGrassMottledSoftness()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("mottled_softness", GrassMottledSoftness);
-        }
-    }
-
-    private void UpdateGrassMottledInvasionFrequency()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("mottled_invasion_frequency", GrassMottledInvasionFrequency);
-        }
-    }
-
-    private void UpdateGrassMottledInvasionDepth()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("mottled_invasion_depth", GrassMottledInvasionDepth);
-        }
-    }
-
-    private void UpdateGrassColors()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("dark_color", GrassDarkColor);
-            grassMaterial.SetShaderParameter("base_color", GrassBaseColor);
-            grassMaterial.SetShaderParameter("light_color", GrassLightColor);
-        }
-    }
-
-    private void UpdateGrassWindDirection()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("wind_direction", GrassWindDirection);
-        }
-
-        if (WindOverlay?.Material is ShaderMaterial windMaterial)
-        {
-            windMaterial.SetShaderParameter("wind_direction", GrassWindDirection);
-        }
-
-        if (WaterPolygon?.Material is ShaderMaterial waterMaterial)
-        {
-            waterMaterial.SetShaderParameter("wind_direction", GrassWindDirection);
-        }
-
-        if (WaterOverlay?.Material is ShaderMaterial waterOverlayMaterial)
-        {
-            waterOverlayMaterial.SetShaderParameter("wind_direction", GrassWindDirection);
-        }
-    }
-
-    private void UpdateGrassWindDivergence()
-    {
-        if (GrassPolygon?.Material is ShaderMaterial grassMaterial)
-        {
-            grassMaterial.SetShaderParameter("wind_divergence", GrassWindDivergence);
-        }
-
-        if (WindOverlay?.Material is ShaderMaterial windMaterial)
-        {
-            windMaterial.SetShaderParameter("wind_divergence", GrassWindDivergence);
-        }
-
-        if (WaterPolygon?.Material is ShaderMaterial waterMaterial)
-        {
-            waterMaterial.SetShaderParameter("wind_divergence", GrassWindDivergence);
-        }
-
-        if (WaterOverlay?.Material is ShaderMaterial waterOverlayMaterial)
-        {
-            waterOverlayMaterial.SetShaderParameter("wind_divergence", GrassWindDivergence);
-        }
-    }
-
-    private void UpdateTileVisual()
-    {
-        var hexagon = BuildRegularHexagon(BianChang, YCompression);
-        bool isGrass = State == TileState.Grass;
-        bool isWater = State == TileState.Water;
-
-        if (GrassPolygon != null)
-        {
-            GrassPolygon.Polygon = hexagon;
-            GrassPolygon.Visible = isGrass && IsDynamicVisible;
-        }
-
-        if (WindOverlay != null)
-        {
-            WindOverlay.Polygon = hexagon;
-            WindOverlay.Visible = isGrass && IsDynamicVisible;
-        }
-
-        if (WaterPolygon != null)
-        {
-            WaterPolygon.Polygon = hexagon;
-            WaterPolygon.Visible = isWater && IsDynamicVisible;
-        }
-
-        if (WaterOverlay != null)
-        {
-            WaterOverlay.Polygon = hexagon;
-            WaterOverlay.Visible = isWater && IsDynamicVisible;
-        }
-
-        if (TileSprite != null)
-        {
-            TileSprite.Visible = !isGrass && !isWater;
-            TileSprite.Scale = new Vector2(TileSprite.Scale.X, YCompression);
-            TileSprite.Position = new Vector2(
-                TileSprite.Position.X,
-                State == TileState.Mountain ? -26f : 0f
-            );
-            TileSprite.ZIndex = State == TileState.Mountain ? 1 : 0;
-            TileSprite.Texture = State switch
-            {
-                TileState.Mountain => MountainTexture,
-                _ => null
-            };
-        }
-
-        ObstacleGroup = State == TileState.Mountain ? 1 : 0;
-
-        if (SelectionLine != null)
-        {
-            SelectionLine.Points = hexagon;
-            SelectionLine.DefaultColor = NormalBorderColor;
-            SelectionLine.Width = 2f;
-            SelectionLine.Closed = true;
-            SelectionLine.Visible = true;
-        }
-
-        if (_rangeOverlay != null)
-        {
-            _rangeOverlay.Polygon = hexagon;
-        }
-    }
-
-    public void SetRangeOverlay(bool enabled, Color? color = null)
-    {
-        if (_rangeOverlay == null)
-        {
-            _rangeOverlay = new Polygon2D
-            {
-                Name = "RangeOverlay",
-                Polygon = BuildRegularHexagon(BianChang, YCompression),
-                ZIndex = 2,
-                Visible = false
-            };
-            AddChild(_rangeOverlay);
-        }
-
-        if (enabled)
-        {
-            _rangeOverlay.Polygon = BuildRegularHexagon(BianChang, YCompression);
-            _rangeOverlay.Color = color ?? new Color(1f, 0.2f, 0.2f, 0.35f);
-            _rangeOverlay.Visible = true;
-        }
-        else
-        {
-            _rangeOverlay.Visible = false;
+            _targetPreview.Mesh = CreateHexMesh(TargetPreviewMeshHeight);
+            _targetPreview.MaterialOverride = CreateMaterial(TargetPreviewColor, true);
         }
     }
 
     public void SetSelected(bool selected)
     {
-        ZIndex = selected ? HighlightedZIndex : DefaultZIndex;
-
-        if (SelectionLine != null)
-        {
-            SelectionLine.Visible = true;
-            SelectionLine.DefaultColor = selected
-                ? HighlightBorderColor
-                : NormalBorderColor;
-        }
+        _isSelected = selected;
+        RefreshBaseOutline();
     }
 
-    public void OnTileInput(Viewport viewport, InputEvent @event, long shapeIdx)
+    public void SetState(TileState state)
     {
-        if (!IsDynamicVisible)
-        {
-            return;
-        }
-
-        if (@event is InputEventMouseMotion)
-        {
-            if (WorldRef != null)
-            {
-                WorldRef.HandleTileHover(this);
-            }
-
-            return;
-        }
-
-        if (!(@event is InputEventMouseButton mouseButton))
-        {
-            return;
-        }
-
-        if (!mouseButton.Pressed || mouseButton.ButtonIndex != MouseButton.Left)
-        {
-            return;
-        }
-
-        if (WorldRef != null)
-        {
-            WorldRef.HandleTileClick(this);
-        }
+        State = state;
+        WorldRef?.NotifyBoardStateChanged();
     }
 
-    public void SetGridPosition(Vector2I position)
+    public void SetTargetPreview(bool visible) => _targetPreview.Visible = visible;
+    public void SetRangeOverlay(bool enabled, Color? color = null)
     {
-        GridPosition = position;
+        for (int edge = 0; edge < _rangeHighlightedEdges.Length; edge++)
+        {
+            _rangeHighlightedEdges[edge] = enabled;
+        }
+        RefreshBaseOutline();
     }
 
+    public void SetRangeOutlineEdges(bool[] visibleEdges, Color color)
+    {
+        for (int edge = 0; edge < _rangeHighlightedEdges.Length; edge++)
+        {
+            _rangeHighlightedEdges[edge] = visibleEdges != null && edge < visibleEdges.Length && visibleEdges[edge];
+        }
+        RefreshBaseOutline();
+    }
     public Vector2[] GetHexagonVertices()
     {
-        return BuildRegularHexagon(BianChang, YCompression);
+        var vertices = new Vector2[HexGeometry.EdgeCount];
+        for (int index = 0; index < vertices.Length; index++)
+        {
+            float angle = Mathf.DegToRad(HexGeometry.FirstVertexAngleDegrees + index * HexGeometry.AngleStepDegrees);
+            vertices[index] = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * HexRadius;
+        }
+        return vertices;
+    }
+    private Color GetBaseColor() => State switch { TileState.Mountain => MountainColor, TileState.Water => WaterColor, _ => GrassColor };
+
+    private void RefreshBaseMesh()
+    {
+        if (_baseMesh == null) return;
+        _baseMesh.Mesh = CreateHexMesh(BaseMeshHeight);
+        _baseMesh.MaterialOverride = StylizedMaterials.Create(GetBaseColor());
     }
 
-    public static Vector2[] BuildRegularHexagon(float sideLength, float yCompression)
+    private CylinderMesh CreateHexMesh(float height) => new() { TopRadius = HexRadius, BottomRadius = HexRadius, Height = height, RadialSegments = HexGeometry.EdgeCount, Rings = MeshRingCount };
+    private static StandardMaterial3D CreateMaterial(Color color, bool transparent = false) => new() { AlbedoColor = color, Transparency = transparent ? BaseMaterial3D.TransparencyEnum.Alpha : BaseMaterial3D.TransparencyEnum.Disabled };
+    private void RefreshBaseOutline()
     {
-        var points = new Vector2[6];
-        // yCompression is applied to the Y component of each vertex
-        for (int i = 0; i < 6; i++)
+        if (_baseOutline == null) return;
+
+        var vertices = new Vector3[HexGeometry.EdgeCount];
+        var widths = new float[HexGeometry.EdgeCount];
+        var colors = new Color[HexGeometry.EdgeCount];
+        for (int index = 0; index < HexGeometry.EdgeCount; index++)
         {
-            float angle = Mathf.DegToRad(30 + i * 60);
-            points[i] = new Vector2(
-                Mathf.Cos(angle) * sideLength,
-                Mathf.Sin(angle) * sideLength * yCompression
-            );
+            float angle = Mathf.DegToRad(HexGeometry.FirstVertexAngleDegrees + index * HexGeometry.AngleStepDegrees);
+            vertices[index] = new Vector3(Mathf.Cos(angle) * HexRadius, 0f, Mathf.Sin(angle) * HexRadius);
+            bool highlighted = _isSelected || _rangeHighlightedEdges[index];
+            widths[index] = HexRadius * OutlineWidth * (highlighted ? HighlightWidthScale : 1f);
+            colors[index] = highlighted ? HighlightOutlineColor : NormalOutlineColor;
         }
 
-        return points;
+        var mesh = new ImmediateMesh();
+        mesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+        for (int index = 0; index < HexGeometry.EdgeCount; index++)
+        {
+            int nextIndex = (index + 1) % HexGeometry.EdgeCount;
+            AddOutlineBand(mesh, vertices[index], vertices[nextIndex], widths[index], colors[index]);
+
+            int previousIndex = index == 0 ? HexGeometry.EdgeCount - 1 : index - 1;
+            Vector3 previousInward = GetEdgeInward(vertices[previousIndex], vertices[index], widths[previousIndex]);
+            Vector3 currentInward = GetEdgeInward(vertices[index], vertices[nextIndex], widths[index]);
+            Color jointColor = _isSelected || _rangeHighlightedEdges[previousIndex] || _rangeHighlightedEdges[index]
+                ? HighlightOutlineColor
+                : NormalOutlineColor;
+            AddColoredVertex(mesh, vertices[index], jointColor);
+            AddColoredVertex(mesh, vertices[index] + previousInward, jointColor);
+            AddColoredVertex(mesh, vertices[index] + currentInward, jointColor);
+        }
+        mesh.SurfaceEnd();
+        _baseOutline.Mesh = mesh;
     }
 
+    private static void AddOutlineBand(ImmediateMesh mesh, Vector3 start, Vector3 end, float width, Color color)
+    {
+        Vector3 inward = GetEdgeInward(start, end, width);
+        AddColoredVertex(mesh, start, color);
+        AddColoredVertex(mesh, end, color);
+        AddColoredVertex(mesh, end + inward, color);
+        AddColoredVertex(mesh, start, color);
+        AddColoredVertex(mesh, end + inward, color);
+        AddColoredVertex(mesh, start + inward, color);
+    }
+
+    private static Vector3 GetEdgeInward(Vector3 start, Vector3 end, float width) =>
+        -((start + end) * 0.5f).Normalized() * width;
+
+    private static void AddColoredVertex(ImmediateMesh mesh, Vector3 vertex, Color color)
+    {
+        mesh.SurfaceSetColor(color);
+        mesh.SurfaceAddVertex(vertex);
+    }
+
+    private static StandardMaterial3D CreateLineMaterial(Color color) => new()
+    {
+        AlbedoColor = color,
+        ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
+        VertexColorUseAsAlbedo = true,
+        CullMode = BaseMaterial3D.CullModeEnum.Disabled
+    };
 }

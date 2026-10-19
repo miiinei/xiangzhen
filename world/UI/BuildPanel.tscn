@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://world/UI/BuildPanel.cs" id="1_build_panel"]
+
+[node name="BuildPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 12
+anchor_right = 1.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 1
+script = ExtResource("1_build_panel")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Toolbar" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="GrassButton" type="Button" parent="Panel/Toolbar"]
+layout_mode = 2
+
+[node name="MountainButton" type="Button" parent="Panel/Toolbar"]
+layout_mode = 2
+
+[node name="WaterButton" type="Button" parent="Panel/Toolbar"]
+layout_mode = 2

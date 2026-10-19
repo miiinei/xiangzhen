@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://c6qhvsw8k5s70"]
+
+[ext_resource type="PackedScene" uid="uid://w1gytdo71btt" path="res://template/Skill/Skill.tscn" id="1_h2fg0"]
+[ext_resource type="Texture2D" uid="uid://cc0yvj6c0ustf" path="res://template/Skill/丢射炮/丢射炮.png" id="2_v1uxd"]
+[ext_resource type="PackedScene" uid="uid://bdjeeigw5ao4n" path="res://template/Skill/丢射炮/丢射炮2.tscn" id="3_qb245"]
+
+[node name="Skill" unique_id=24165535 instance=ExtResource("1_h2fg0")]
+IconTexture = ExtResource("2_v1uxd")
+Damage = 1
+Range = 4
+CanTargetMountain = true
+MultiTargetSkill = ExtResource("3_qb245")
+HitNone = true

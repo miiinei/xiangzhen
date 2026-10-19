@@ -2,12 +2,19 @@ using Godot;
 
 public partial class 龙骑士 : Piece
 {
+    private const int DragonKnightMoveRange = 3;
+    private static readonly int[] DragonKnightTraversableGroups =
+    {
+        ObstacleGroups.Ground,
+        ObstacleGroups.FlyingUnit
+    };
+
     public override void _Ready()
     {
         base._Ready();
 
-        MoveRange = 3;
-        ObstacleGroup = 2;
-        MoveGroups = new[] { 0, 2 };
+        MoveRange = DragonKnightMoveRange;
+        ObstacleGroup = ObstacleGroups.FlyingUnit;
+        MoveGroups = DragonKnightTraversableGroups;
     }
 }

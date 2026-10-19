@@ -1,101 +1,46 @@
-[gd_scene format=3 uid="uid://bw5xuq1db3j3g"]
+[gd_scene format=3 uid="uid://b6s4vel6q4oi3"]
 
-[ext_resource type="Script" uid="uid://dksehxjhcj3b" path="res://template/tile/Tile.cs" id="1_yvxeo"]
-[ext_resource type="Shader" uid="uid://c8q7g2oytqkvl" path="res://template/tile/Grass.gdshader" id="2_grass"]
-[ext_resource type="Shader" uid="uid://88gj1iai1uuj" path="res://template/tile/GrassWindOverlay.gdshader" id="3_wind"]
+[ext_resource type="Script" uid="uid://dksehxjhcj3b" path="res://template/tile/Tile.cs" id="1_tile"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_grass"]
-shader = ExtResource("2_grass")
-shader_parameter/wind_wave_spacing = 60.0
-shader_parameter/wind_speed = 1.0
-shader_parameter/pixel_size = 3.0
-shader_parameter/jitter_frequency = 5.0
-shader_parameter/jitter_block_size = 3.0
-shader_parameter/mottled_patch_size = 24.0
-shader_parameter/mottled_softness = 0.35
-shader_parameter/mottled_invasion_frequency = 1.5
-shader_parameter/mottled_invasion_depth = 8.0
-shader_parameter/use_mottled_background = true
-shader_parameter/wind_direction = Vector2(-1, 1)
-shader_parameter/wind_divergence = 14.0
-shader_parameter/base_color = Color(0.24, 0.37, 0.25, 1)
-shader_parameter/dark_color = Color(0.18, 0.3, 0.2, 1)
-shader_parameter/light_color = Color(0.3, 0.44, 0.29, 1)
-shader_parameter/enable_dynamic = true
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_base"]
+albedo_color = Color(0.23, 0.43, 0.25, 1)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_wind"]
-shader = ExtResource("3_wind")
-shader_parameter/wind_wave_spacing = 60.0
-shader_parameter/wind_speed = 1.0
-shader_parameter/wind_direction = Vector2(-1, 1)
-shader_parameter/wind_divergence = 14.0
-shader_parameter/overlay_color = Color(0.48, 0.66, 0.4, 1)
-shader_parameter/enable_dynamic = true
+[sub_resource type="CylinderMesh" id="CylinderMesh_base"]
+top_radius = 1.0
+bottom_radius = 1.0
+height = 0.16
+radial_segments = 6
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_water"]
-shader = ExtResource("2_grass")
-shader_parameter/wind_wave_spacing = 60.0
-shader_parameter/wind_speed = 1.0
-shader_parameter/pixel_size = 3.0
-shader_parameter/jitter_frequency = 5.0
-shader_parameter/jitter_block_size = 3.0
-shader_parameter/mottled_patch_size = 24.0
-shader_parameter/mottled_softness = 0.35
-shader_parameter/mottled_invasion_frequency = 1.5
-shader_parameter/mottled_invasion_depth = 8.0
-shader_parameter/use_mottled_background = false
-shader_parameter/wind_direction = Vector2(-1, 1)
-shader_parameter/wind_divergence = 14.0
-shader_parameter/base_color = Color(0.16, 0.34, 0.4, 1)
-shader_parameter/dark_color = Color(0.11, 0.26, 0.32, 1)
-shader_parameter/light_color = Color(0.25, 0.45, 0.5, 1)
-shader_parameter/enable_dynamic = true
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outline"]
+shading_mode = 2
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.68, 0.7, 0.72, 0.8)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_water_overlay"]
-shader = ExtResource("3_wind")
-shader_parameter/wind_wave_spacing = 60.0
-shader_parameter/wind_speed = 1.0
-shader_parameter/wind_direction = Vector2(-1, 1)
-shader_parameter/wind_divergence = 14.0
-shader_parameter/overlay_color = Color(0.39, 0.66, 0.72, 1)
-shader_parameter/enable_dynamic = true
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_target"]
+transparency = 1
+albedo_color = Color(1, 0.2, 0.2, 0.32)
 
-[node name="Tile" type="Area2D" unique_id=2102016298]
-script = ExtResource("1_yvxeo")
-HighlightBorderColor = Color(0.3697869, 0.72870713, 0.91942966, 1)
-YCompression = 1.0
-GrassWindWaveSpacing = 200.0
-GrassJitterFrequency = 3.0
-GrassMottledPatchSize = 36.0
-GrassMottledSoftness = 1.5
-GrassMottledInvasionFrequency = 6.0
-GrassMottledInvasionDepth = 24.0
-GrassDarkColor = Color(0.3034329, 0.44131508, 0.25479063, 1)
-GrassBaseColor = Color(0.32941177, 0.47843137, 0.2784314, 1)
-GrassLightColor = Color(0.3698617, 0.5294437, 0.31403458, 1)
+[sub_resource type="CylinderMesh" id="CylinderMesh_target"]
+top_radius = 1.0
+bottom_radius = 1.0
+height = 0.02
+radial_segments = 6
 
-[node name="GrassPolygon" type="Polygon2D" parent="." unique_id=104866631]
-material = SubResource("ShaderMaterial_grass")
-polygon = PackedVector2Array(55.4256, 32, 0, 64, -55.4256, 32, -55.4256, -32, 0, -64, 55.4256, -32)
+[node name="Tile" type="Node3D" unique_id=163214615]
+script = ExtResource("1_tile")
+OutlineWidth = 0.02
+HighlightWidthScale = 4.0
 
-[node name="WindOverlay" type="Polygon2D" parent="." unique_id=1774410830]
-material = SubResource("ShaderMaterial_wind")
-polygon = PackedVector2Array(55.4256, 32, 0, 64, -55.4256, 32, -55.4256, -32, 0, -64, 55.4256, -32)
+[node name="BaseMesh" type="MeshInstance3D" parent="." unique_id=1297325760]
+material_override = SubResource("StandardMaterial3D_base")
+mesh = SubResource("CylinderMesh_base")
 
-[node name="WaterPolygon" type="Polygon2D" parent="." unique_id=946359352]
-material = SubResource("ShaderMaterial_water")
-polygon = PackedVector2Array(55.4256, 32, 0, 64, -55.4256, 32, -55.4256, -32, 0, -64, 55.4256, -32)
+[node name="BaseOutline" type="MeshInstance3D" parent="." unique_id=1557545245]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.085, 0)
+material_override = SubResource("StandardMaterial3D_outline")
 
-[node name="WaterOverlay" type="Polygon2D" parent="." unique_id=902786408]
-material = SubResource("ShaderMaterial_water_overlay")
-polygon = PackedVector2Array(55.4256, 32, 0, 64, -55.4256, 32, -55.4256, -32, 0, -64, 55.4256, -32)
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=9866825]
-
-[node name="CollisionShape2D" type="CollisionPolygon2D" parent="." unique_id=498672143]
-
-[node name="SelectionLine" type="Line2D" parent="." unique_id=1942069671]
+[node name="TargetPreview" type="MeshInstance3D" parent="." unique_id=1797577943]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, 0)
 visible = false
-closed = true
-width = 2.0
-default_color = Color(1, 0.8, 0.2, 1)
+material_override = SubResource("StandardMaterial3D_target")
+mesh = SubResource("CylinderMesh_target")

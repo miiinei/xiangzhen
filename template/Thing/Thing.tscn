@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://bbqthingbase01"]
+[gd_scene format=3 uid="uid://x5m64506yi65"]
 
-[ext_resource type="Script" path="res://template/Thing/Thing.cs" id="1_thing_script"]
+[ext_resource type="Script" uid="uid://dr7xehcv7mt7g" path="res://template/Thing/Thing.cs" id="1_thing"]
 
-[node name="Thing" type="Node2D"]
-script = ExtResource("1_thing_script")
+[node name="Thing" type="Node3D" unique_id=725758747]
+script = ExtResource("1_thing")
