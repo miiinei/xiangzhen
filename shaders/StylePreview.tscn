@@ -1,8 +1,12 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Material" path="res://shaders/cloud_layer.tres" id="2_cloud"]
 [ext_resource type="Shader" path="res://shaders/low_poly.gdshader" id="3_shader"]
 [ext_resource type="Texture2D" path="res://shaders/cloud_noise.tres" id="4_noise"]
+[ext_resource type="Texture3D" path="res://shaders/cloud_volume_noise.tres" id="5_volume"]
+
+[ext_resource type="Texture3D" path="res://shaders/cloud_base_noise.tres" id="6_base"]
+[ext_resource type="Script" path="res://shaders/CloudWeather.gd" id="7_weather"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 size = Vector2(40, 40)
@@ -13,13 +17,15 @@ bottom_radius = 1.6
 height = 3.0
 radial_segments = 6
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_cloud"]
-size = Vector2(100, 100)
+[sub_resource type="QuadMesh" id="QuadMesh_cloud"]
+size = Vector2(2, 2)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_piece"]
 shader = ExtResource("3_shader")
 shader_parameter/base_color = Color(0.85, 0.45, 0.18, 1)
 shader_parameter/cloud_noise = ExtResource("4_noise")
+shader_parameter/cloud_volume_noise = ExtResource("5_volume")
+shader_parameter/cloud_base_noise = ExtResource("6_base")
 
 [sub_resource type="Environment" id="Environment_preview"]
 background_mode = 1
@@ -28,6 +34,8 @@ background_color = Color(0.52, 0.73, 0.85, 1)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grass"]
 shader = ExtResource("3_shader")
 shader_parameter/cloud_noise = ExtResource("4_noise")
+shader_parameter/cloud_volume_noise = ExtResource("5_volume")
+shader_parameter/cloud_base_noise = ExtResource("6_base")
 shader_parameter/grass_wind_strength = 0.45
 
 [node name="StylePreview" type="Node3D"]
@@ -41,12 +49,6 @@ position = Vector3(0, 1.5, 0)
 mesh = SubResource("CylinderMesh_piece")
 material_override = SubResource("ShaderMaterial_piece")
 
-[node name="CloudLayer" type="MeshInstance3D" parent="."]
-position = Vector3(0, 7, 0)
-cast_shadow = 0
-mesh = SubResource("PlaneMesh_cloud")
-material_override = ExtResource("2_cloud")
-
 [node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
 shadow_enabled = true
@@ -58,5 +60,14 @@ projection = 1
 size = 22.0
 current = true
 
+[node name="CloudLayer" type="MeshInstance3D" parent="Camera3D"]
+position = Vector3(0, 0, -1)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_cloud")
+material_override = ExtResource("2_cloud")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_preview")
+
+[node name="CloudWeather" type="Node" parent="."]
+script = ExtResource("7_weather")

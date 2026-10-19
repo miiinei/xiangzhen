@@ -7,8 +7,10 @@
 [ext_resource type="PackedScene" path="res://world/UI/BuildPanel.tscn" id="5_build_panel"]
 [ext_resource type="Material" path="res://shaders/cloud_layer.tres" id="6_cloud"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_cloud"]
-size = Vector2(100, 100)
+[ext_resource type="Script" path="res://shaders/CloudWeather.gd" id="7_weather"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_cloud"]
+size = Vector2(2, 2)
 
 [sub_resource type="Environment" id="Environment_world"]
 background_mode = 1
@@ -34,10 +36,10 @@ size = 20.0
 transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
 shadow_enabled = true
 
-[node name="CloudLayer" type="MeshInstance3D" parent="."]
-position = Vector3(16, 7, 14)
+[node name="CloudLayer" type="MeshInstance3D" parent="Camera3D"]
+position = Vector3(0, 0, -1)
 cast_shadow = 0
-mesh = SubResource("PlaneMesh_cloud")
+mesh = SubResource("QuadMesh_cloud")
 material_override = ExtResource("6_cloud")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1471986509]
@@ -63,3 +65,6 @@ offset_bottom = -16.0
 grow_horizontal = 0
 grow_vertical = 0
 text = "结束回合"
+
+[node name="CloudWeather" type="Node" parent="."]
+script = ExtResource("7_weather")

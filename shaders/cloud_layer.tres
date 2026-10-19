@@ -1,8 +1,14 @@
-[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+[gd_resource type="ShaderMaterial" load_steps=5 format=3]
 
 [ext_resource type="Shader" path="res://shaders/cloud_layer.gdshader" id="1_shader"]
 [ext_resource type="Texture2D" path="res://shaders/cloud_noise.tres" id="2_noise"]
+[ext_resource type="Texture3D" path="res://shaders/cloud_volume_noise.tres" id="3_volume"]
+
+[ext_resource type="Texture3D" path="res://shaders/cloud_base_noise.tres" id="4_base"]
 
 [resource]
+render_priority = -10
 shader = ExtResource("1_shader")
 shader_parameter/cloud_noise = ExtResource("2_noise")
+shader_parameter/cloud_volume_noise = ExtResource("3_volume")
+shader_parameter/cloud_base_noise = ExtResource("4_base")

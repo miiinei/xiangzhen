@@ -3,8 +3,8 @@
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_cloud"]
 noise_type = 3
 seed = 317
-frequency = 0.004
-fractal_octaves = 2
+frequency = 0.009
+fractal_octaves = 4
 
 [resource]
 noise = SubResource("FastNoiseLite_cloud")
