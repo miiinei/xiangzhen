@@ -7,28 +7,28 @@ prior_report_approval_ref: A006
 branch: codex/realistic-clouds
 base_ref: master
 base_commit: d6b1545b527bd8165b8a6c1e8b4817ec695828bc
-reviewed_commit: 08515f05f49fa0ea771b39f145d97514132cd6a2
+reviewed_commit: 2cbfa3975b6de1f296b2a6ebcbca2d8bedc136f4
 target_ref: origin/master
 target_observed_commit: d6b1545b527bd8165b8a6c1e8b4817ec695828bc
-remote_branch_observed_commit: b601af16cbcfb6fbafc203f69fdb732e9dff8b81
+remote_branch_observed_commit: 6615014bc73055978033dd846223232ac9711c52
 remote_observation_phase: PRE_PUSH
 checked_on: 2026-10-20
 timezone: Asia/Shanghai
 comparison: base_commit..reviewed_commit
 scope: COMMITTED_NET_DIFF_EXCLUDING_REPORT
-changed_file_count: 23
-insertions: 1063
+changed_file_count: 25
+insertions: 1077
 deletions: 167
-post_base_commit_count: 8
+post_base_commit_count: 10
 post_base_merge_commit_count: 0
 upstream_sync_status: NO_POST_BASE_MAINLINE_UPDATE_OBSERVED
-runtime_validation_this_review: NOT_RUN
+runtime_validation_this_review: RUNTIME_CHECKED
 merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 ---
 
 # 云开发分支变更报告
 
-本报告在 A006 已审阅的初版基础上，按 A009 的本次推送要求更新；本次新增内容尚未经用户单独审阅，记录为 `UPDATED_NOT_USER_REVIEWED`，不据此要求重复确认已授权的提交／推送。统计覆盖固定起点到 `reviewed_commit` 的 23 个非报告变更文件；完整文件索引另列报告自身，合计 24 个路径。本地未提交改动见 [本地排除项](#local-only)。远端观察值在本次推送前读取，不代表推送后的分支指针。
+本报告在 A006 已审阅的初版基础上，按 A010 的本次改进提交／推送要求更新；本次新增内容尚未经用户单独审阅，记录为 `UPDATED_NOT_USER_REVIEWED`，不据此要求重复确认已授权的提交／推送。统计覆盖固定起点到 `reviewed_commit` 的 25 个非报告变更文件；完整文件索引另列报告自身，合计 26 个路径。本地未提交改动见 [本地排除项](#local-only)。远端观察值在本次推送前读取，不代表推送后的分支指针。
 
 导航：[字段约定](#schema) · [模块索引](#modules) · [完整文件索引](#files) · [额外授权索引](#permissions) · [引入依赖](#integration) · [变更条目](#changes) · [提交索引](#commits) · [授权证据](#approvals) · [验证证据](#validation) · [协作检查](#collaboration) · [本地排除项](#local-only) · [待决定事项](#decisions)
 
@@ -39,18 +39,18 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 
 | 字段 | 允许值及含义 |
 | --- | --- |
-| `report_status` / `report_approval_ref` | `USER_REVIEWED` 表示对应版本已获用户审阅；`UPDATED_NOT_USER_REVIEWED` 表示本次更新尚未单独审阅。A006 保留为初版审阅记录，A009 授权本轮提交／推送；两者均不代表合并或完整运行验收。 |
+| `report_status` / `report_approval_ref` | `USER_REVIEWED` 表示对应版本已获用户审阅；`UPDATED_NOT_USER_REVIEWED` 表示本次更新尚未单独审阅。A006 保留为初版审阅记录，A009 授权上一轮云版本推送，A010 授权本轮两项改进提交／推送；两者均不代表合并或完整运行验收。 |
 | `status` | `ACTIVE` 为当前有效变化，省略时按此值处理；`WITHDRAWN` 为已撤回、退出当前引入候选的历史条目，编号不复用。 |
 | `impact_type` | `MODULE_LOCAL` 模块内部；`SHARED_INTEGRATION` 共用接线；`PROJECT_GLOBAL` 项目级运行行为；`DOCUMENTATION` 文档与来源记录；`DEVELOPMENT_WORKFLOW` 开发工具的项目约定。 |
 | `requires_extra_approval` | `true` 表示按当前本地约定需要额外明确批准；`false` 表示本条位于已授权任务范围内。不能由此判断验证是否通过。 |
 | `approval_status` | `IN_SCOPE` 已有任务范围覆盖；`EXPLICITLY_APPROVED` 找到对应明确要求；`UNCONFIRMED` 额外授权证据尚未确认，不等同于断言从未批准。 |
 | `integration_mode` | `INDEPENDENT` 可独立审阅／选择引入的候选；`WITH_DEPENDENCIES` 应按指定依赖组引入；`REVIEW_REQUIRED` 需要单独决定。均不表示已批准合并。 |
-| `validation_status` | `NOT_RUN` 本次未验证；`STATIC_CHECKED` 本次核对源码、差异或 Git 行为；`RUNTIME_CHECKED` 对明确版本实际运行验证。本次提交准备以 `STATIC_CHECKED` 核对实际源码和 Git 范围，实施阶段的运行结果按 H001～H005 单独记录。 |
+| `validation_status` | `NOT_RUN` 本次未验证；`STATIC_CHECKED` 本次核对源码、差异或 Git 行为；`RUNTIME_CHECKED` 对明确版本实际运行验证。云模块保留 H001～H005 的实施阶段记录；C009 和 C010 本轮按 V005/H006 记录构建、导入、演示与生命周期检查。 |
 | `origin` | `THIS_BRANCH` 本开发分支引入；`UPSTREAM_SYNC` 主分支同步；`LOCAL_ONLY` 工作区独有。当前已提交条目均为 `THIS_BRANCH`。 |
 | `approval_refs` / `validation_refs` | 指向本报告的 `Axxx` / `Vxxx` / `Hxxx` 证据编号；缺失的原始证据不得用助手结论或提交说明替代。 |
 | `depends_on` / `integration_group` | 条目依赖与配套引入组；组内文件不按单文件复制作为默认接入方式。 |
 
-补充规则：路径相对仓库根目录；文内源码链接使用 `../../` 回到根目录。稳定定位采用函数名、配置键、资源属性或节点路径。完整文件索引中的 `A/M` 分别表示新增／修改，增删行数来自固定比较范围。
+补充规则：路径相对仓库根目录；文内源码链接使用 `../../` 回到根目录。稳定定位采用函数名、配置键、资源属性或节点路径。完整文件索引中的 `A/M/D` 分别表示新增／修改／删除，增删行数来自固定比较范围。
 
 <a id="modules"></a>
 ## 模块索引
@@ -65,6 +65,8 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 | 本地规则文件的 Git 忽略 | [C006](#c006) | `.gitignore` 的 `/AGENTS.md` |
 | 云层独立更新与视线缓存 | [C007](#c007) | `_process()`、`_update_view()`、`cloud_view.gdshader`、`cloud_time()` |
 | 缓存初始化与参数组织整理 | [C008](#c008) | `_create_cache_material()`、`_create_cache_viewport()`、最终显示参数归属 |
+| 技能节点生命周期修复 | [C009](#c009) | `Piece._Notification(NotificationPredelete)` |
+| 删除无引用空资源 | [C010](#c010) | 删除零字节 `template/tile/GrassWindNoise.tres` |
 
 <a id="files"></a>
 ## 完整文件索引
@@ -94,9 +96,11 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 | M | [shaders/low_poly.gdshader](../../shaders/low_poly.gdshader) | 3 / 7 | [C003](#c003) | `fragment()` 的云影接收 |
 | M | [shaders/low_poly.tres](../../shaders/low_poly.tres) | 7 / 2 | [C003](#c003) | 共用云场的三维噪声绑定 |
 | M | [world/world.tscn](../../world/world.tscn) | 10 / 5 | [C003](#c003) | `Camera3D/CloudLayer` 与 CloudWeather 节点 |
+| M | [template/Piece/Piece.cs](../../template/Piece/Piece.cs) | 14 / 0 | [C009](#c009) | 棋子销毁时释放未挂树技能 |
+| D | `template/tile/GrassWindNoise.tres` | 0 / 0 | [C010](#c010) | 已删除零字节、无引用资源；删除项不链接到不存在的文件 |
 | A | [docs/branch-reports/codex-realistic-clouds.md](codex-realistic-clouds.md) | 不计入代码统计 | `REPORT_ONLY` | 报告自身，随独立文档提交维护 |
 
-代码统计：23 个文件，1063 行新增、167 行删除。另有报告自身 1 个路径，不参与代码增删统计。`project.godot` 已与固定起点逐字节一致，退出净差异文件表；其撤回历史仍保留在 C004。
+代码统计：25 个文件，1077 行新增、167 行删除。另有报告自身 1 个路径，不参与代码增删统计。`project.godot` 已与固定起点逐字节一致，退出净差异文件表；其撤回历史仍保留在 C004。
 
 <a id="permissions"></a>
 ## 额外授权索引
@@ -108,7 +112,8 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 | 任务范围内的必要共用接线 | [C003](#c003) | 只涉及云影与云时钟接收，草风仍使用原生 TIME，未扩大为地表风格或玩法重做。 |
 | 配套文档 | [C005](#c005) | 参数、来源和当前实现说明，随云功能配套更新。 |
 | 本地约定的对应明确要求 | [C006](#c006) | A004 授权忽略规则单独提交；AGENTS.md 正文继续只保留在本地。 |
-| 本轮提交／推送 | 当前两笔代码提交及报告更新 | A009 授权推送当前版本；不包含本地排除项和主分支合并。 |
+| 新增的明确改进范围 | [C009](#c009)、[C010](#c010) | A010 在两项差异已解释后，授权将有实际改进作用的内容推送；两项均保留，单独作为质量修复提交。 |
+| 本轮提交／推送 | 质量修复及报告更新 | A010；不包含 AGENTS.md 正文、其他新模块或主分支合并。 |
 
 原 C004 添加时的事前独立批准仍记为未确认；本次明确撤回不追溯改写该历史。
 
@@ -119,6 +124,7 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 | --- | --- | --- |
 | `G001` 云功能配套组 | C001、C002、C003、C005、C007、C008 | 云场、噪声、控制器、三份缓存、共用积分、接收材质、场景和说明配套引入；新的云层 shader 会读取视线缓存，不能只复制单个文件。 |
 | 独立候选 | C006 | `ab989dd` 仅修改 `.gitignore`，按目标项目的本地规则约定审阅。 |
+| 独立质量修复 | C009、C010 | 技能释放和空资源删除不依赖云功能组；本轮在同一独立修复提交中提供，可按对应差异审阅。 |
 | 已撤回，退出候选 | C004 | `7d3d951` 添加全局上限；`d9557f2` 已单独移除。当前分支末端的 `project.godot` 与固定起点完全一致。 |
 
 选择历史 `7d3d951` 时仍会带入旧 FPS 键；选择当前云版本时应同时包含其后续恢复与独立更新提交，或审阅相应净差异。本次没有重写历史，也没有合并主分支。
@@ -218,7 +224,7 @@ validation_refs: [V001, V002, H003, V004, H004, H005]
 | `world/world.tscn` | 根节点下的 `CloudLayer`；100×100 PlaneMesh，位置 `(16,7,14)`。 | 改为 `Camera3D/CloudLayer`；2×2 QuadMesh，相机局部位置 `(0,0,-1)`；新增根节点 `CloudWeather`。世界云高由 C001 的参数决定。 |
 | `StylePreview.tscn` | 根节点下的平面云层，缺少新控制器与三维噪声绑定。 | 同步相机子节点云层、控制器与内联材质资源。 |
 
-已有消费路径未改 C# 源码：`world/StylizedMaterials.cs::Create()` 复制 `low_poly.tres`，`template/tile/Tile.cs` 与 `template/Piece/Piece.cs` 使用该工厂。此次变化因此会改变它们表面的云影，但没有重写颜色、选中高亮、草风、雾或原有分档光照公式。
+云影接线本身没有改写消费端 C# 业务流程；本轮独立的技能释放修复另见 C009。已有消费路径：`world/StylizedMaterials.cs::Create()` 复制 `low_poly.tres`，`template/tile/Tile.cs` 与 `template/Piece/Piece.cs` 使用该工厂。此次变化因此会改变它们表面的云影，但没有重写颜色、选中高亮、草风、雾或原有分档光照公式。
 
 协作交集：接收着色器、材质模板、两个场景均属于需与其他模块共同核对的文件。`World.cs` 的相机移动／缩放代码未修改；新增相机子节点仍会使其他相机方案与云显示存在集成依赖。
 
@@ -339,6 +345,50 @@ validation_refs: [V001, V004, H005]
 
 将 9 个仅负责透明度、单位保护和背景云丝的参数放回 cloud_layer；cloud_optics 共用积分函数与必要调度参数。参数名、类型、默认值与计算函数内容保持一致，没有新增每帧积分或纹理采样。缓存之外和高物体遮挡的直接积分仍被使用，未当作旧代码删除。H005 四档视距的清理前后截图逐像素一致。文档整理归入 C005。
 
+<a id="c009"></a>
+### C009 — 补上未挂树技能节点的释放
+
+```yaml
+module: piece_skill_lifecycle
+origin: THIS_BRANCH
+impact_type: SHARED_INTEGRATION
+requires_extra_approval: true
+approval_status: EXPLICITLY_APPROVED
+approval_refs: [A010]
+source_commits: [2cbfa39]
+integration_mode: INDEPENDENT
+integration_group: null
+depends_on: []
+validation_status: RUNTIME_CHECKED
+validation_refs: [V005, H006]
+```
+
+此前 Piece.EnsureSkills() 会实例化尚未挂树的 Skill，面板稍后才将其放入 UI；销毁棋子时，这些脱离场景树的节点没有清理。当前 Piece._Notification() 仅在 NotificationPredelete 时，释放仍有效且 GetParent()==null 的技能。已挂在 UI 等父节点下的技能不在此处主动释放。
+
+修改共 14 行，位于共用棋子基类，作用于技能的生命周期；不改变技能效果、移动、攻击或数值规则。V005 在最新源码副本中复核未选中退出、面板切换后退出、单位死亡，三种情况各检查 14 个技能节点，均通过，未发现清理其他存活棋子技能或退出残留节点的问题。
+
+<a id="c010"></a>
+### C010 — 删除无引用的零字节资源
+
+```yaml
+module: project_resource_cleanup
+origin: THIS_BRANCH
+impact_type: MODULE_LOCAL
+requires_extra_approval: false
+approval_status: EXPLICITLY_APPROVED
+approval_refs: [A010]
+source_commits: [2cbfa39]
+integration_mode: INDEPENDENT
+integration_group: null
+depends_on: []
+validation_status: RUNTIME_CHECKED
+validation_refs: [V005, H006]
+```
+
+删除 template/tile/GrassWindNoise.tres：旧 Git 对象大小为 0 字节，没有有效资源内容，当前项目无场景、材质或代码引用。实际草风由 low_poly.gdshader 直接计算。空 .tres 曾在编辑器扫描时触发解析错误；本次删除后重新导入通过。没有修改草风着色器或参数。
+
+该文件已不存在，因此净差异索引用删除状态和仓库相对路径记录；旧内容可从父提交查询。它是独立的资源加载修复，不作为新增天气噪声或素材变更处理。
+
 <a id="commits"></a>
 ## 提交索引
 
@@ -352,8 +402,10 @@ validation_refs: [V001, V004, H005]
 | `b601af16cbcfb6fbafc203f69fdb732e9dff8b81` | docs: update branch report maintenance timing | REPORT_ONLY；报告维护时机 |
 | `d9557f2524c5e72b71c5e0e493ff06a3e9eb9a4b` | fix: restore mainline frame rate settings | C004；单独恢复项目配置 |
 | `08515f05f49fa0ea771b39f145d97514132cd6a2` | perf: update clouds independently and simplify cache setup | C001、C002、C003、C005、C007、C008 |
+| `6615014bc73055978033dd846223232ac9711c52` | docs: update cloud branch report for independent cadence | REPORT_ONLY；云更新和整理的报告 |
+| `2cbfa3975b6de1f296b2a6ebcbca2d8bedc136f4` | fix: release detached skills and remove empty resource | C009、C010；独立质量修复 |
 
-固定起点为 `d6b1545b527bd8165b8a6c1e8b4817ec695828bc`。代码核对点范围内共 8 次提交，0 次合并提交；本次推送前观察的远端云分支为 `b601af16cbcfb6fbafc203f69fdb732e9dff8b81`，目标主支仍为固定起点。更新本报告的后续独立文档提交属于 REPORT_ONLY，保留上述 reviewed_commit，不要求报告记录包含自身内容的未知哈希。
+固定起点为 `d6b1545b527bd8165b8a6c1e8b4817ec695828bc`。代码核对点范围内共 10 次提交，0 次合并提交；本次推送前观察的远端云分支为 `6615014bc73055978033dd846223232ac9711c52`，目标主支仍为固定起点。更新本报告的后续独立文档提交属于 REPORT_ONLY，保留上述 reviewed_commit，不要求报告记录包含自身内容的未知哈希。
 
 <a id="approvals"></a>
 ## 授权证据索引
@@ -385,22 +437,27 @@ validation_refs: [V001, V004, H005]
 **A008 — 清理多轮修改的冗余。** 来源：同一云任务，2026-10-20 用户消息。要求检查多轮修改造成的冗余，并提出“如果有那种不影响性能的屎山，那就修改”。覆盖云初始化、参数组织和过时说明的清理，不扩展为玩法或基础框架重做。
 
 <a id="a009"></a>
-**A009 — 当前版本提交／推送。** 来源：同一云任务，2026-10-20 最新用户消息，原话：“将这一版推送吧”。按上一轮交付的范围，将项目设置恢复、云层独立更新及代码清理提交到现有开发分支，并按本地约定集中更新本报告；不包含 Piece.cs、空资源删除、AGENTS.md 正文或主分支合并。
+**A009 — 上一轮云版本提交／推送。** 来源：同一云任务，2026-10-20 当时的用户消息，原话：“将这一版推送吧”。按上一轮交付的范围，将项目设置恢复、云层独立更新及代码清理提交到现有开发分支，并按本地约定集中更新本报告；不包含 Piece.cs、空资源删除、AGENTS.md 正文或主分支合并。
+
+<a id="a010"></a>
+**A010 — 对剩余两项差异按改进价值处理并推送。** 来源：同一任务，2026-10-20 最新用户消息。用户在已经看到 Piece.cs 技能释放与空资源删除的具体说明后，要求：“如果不是业务代码那就撤销，如果是改进那就推送”。本轮核对两项均有实际修复作用，保留原差异并单独提交／推送，未增加其他实现或项目设置变化。
 
 <a id="validation"></a>
 ## 验证与证据索引
 
 | 编号 | 类型与可访问范围 | 实际核对内容 | 结论边界 |
 | --- | --- | --- | --- |
-| V001 | CURRENT_STATIC；仓库可复核 | 固定基准至代码核对点的 23 个非报告文件、1063/167 行、8 次提交；完整路径另包含报告自身。 | 确认范围、接线和统计，不等于完整运行验收。 |
+| V001 | CURRENT_STATIC；仓库可复核 | 固定基准至代码核对点的 25 个非报告文件、1077/167 行、10 次提交；完整路径另包含报告自身。 | 确认范围、接线和统计，不等于完整运行验收。 |
 | V002 | HISTORICAL_STATIC + LOCAL_ARTIFACT | 初版报告核对过的六份旧核心源码及当时项目配置，旧哈希保留如下。 | 属于 7d3d951 版本，不再声称与当前已改源码逐字节相同。 |
 | V003 | CURRENT_GIT_CHECK | AGENTS.md 命中根忽略规则，未被跟踪；ab989dd 仅改 .gitignore。 | 忽略和提交范围，不包含游戏行为验证。 |
-| V004 | CURRENT_STATIC + LOCAL_ARTIFACT | 待提交源码与 H004/H005 的对应记录核对；project.godot 与起点逐字节相同。最终 cloud_optics 仅移除记录版本末尾一个多余空行，去除末尾空白后文本相同。H005 所查积分和合成函数内容、参数名／类型／默认值保持一致。 | 复用实施阶段证据；本次 Git 请求没有重新启动 Godot、构建或跑 GPU 测试。 |
+| V004 | HISTORICAL_STATIC + LOCAL_ARTIFACT | 待提交源码与 H004/H005 的对应记录核对；project.godot 与起点逐字节相同。最终 cloud_optics 仅移除记录版本末尾一个多余空行，去除末尾空白后文本相同。H005 所查积分和合成函数内容、参数名／类型／默认值保持一致。 | 这是上一轮云版本推送准备的源码核对；当时没有重新运行游戏。本轮 C009/C010 的新验证另见 V005。 |
 | H001 | HISTORICAL_RUNTIME_RECORD；LOCAL_ARTIFACT | 截断修复：7 个平移位置、近远景、4:3 与超宽比例。 | 原始材料仅本机可访问。 |
 | H002 | HISTORICAL_RUNTIME_RECORD；LOCAL_ARTIFACT | 高度调整前的云量缓存性能、动态演化及缓存边界检查。 | 不作为当前最终版本耗时。 |
 | H003 | HISTORICAL_RUNTIME_RECORD；LOCAL_ARTIFACT | 高度版本：最近景淡出、缩放不改物理云影、内部演化和层间遮光，4 次运行退出码 0。 | 当时项目默认 60 FPS；不是本次恢复设置后的结果。 |
 | H004 | IMPLEMENTATION_RUNTIME_RECORD；LOCAL_ARTIFACT | 独立更新阶段 12 项检查通过，静止／平移云时钟约 20.3 Hz、场景约 165.4／164.5 FPS；缓存外、云内高物体和 resize 检查通过。 | 清理前版本，后续差异由 H005 复核；原始材料未随仓库共享。 |
 | H005 | IMPLEMENTATION_RUNTIME_RECORD；LOCAL_ARTIFACT | 清理后 12 项检查通过；size 8/20/30/40 清理前后逐像素一致；静止／平移场景约 165.5／164.4 FPS，云约 20.3 Hz，云体纹理继续变化。1280×720 缓存与直接积分全图平均 RGB 差约 0.034/255。 | Godot 4.6.1 Mono、GL Compatibility、1920×1080、RTX 3060 Laptop；Engine.max_fps=0、原有 VSync 开启。隔离副本，复用已有 C# 程序集，含本地 Piece 修复，未证明纯提交版完整运行。 |
+| V005 | CURRENT_RUNTIME + LOCAL_ARTIFACT | 隔离副本中 95 个生产文件与 `2cbfa39` 逐字节对应，另加独立测试 harness；构建 0 警告、0 错误，资源导入成功，实际 GL Compatibility 演示运行 120 帧成功，三类生命周期检查全部通过，每类检查 14 个技能节点。日志无 ERROR、WARNING、泄漏或 CHECK FAIL。 | Godot 4.6.1 Mono、.NET SDK 8.0.426；运行用 1920×1080，测试副本包含暖机后的生命周期场景。测试脚本不进入产品提交；不等同于全部玩法或其他设备验收。 |
+| H006 | CURRENT_RUNTIME_RECORD；LOCAL_ARTIFACT | V005 对应的本轮构建、导入、演示及生命周期日志和源码快照。 | 原始文件只在本机，摘要与哈希如下；报告更新本身在代码验证之后完成。 |
 
 V002 历史源码 SHA-256（旧核对点 7d3d951；并非当前 reviewed_commit）：
 
@@ -416,7 +473,7 @@ V002 历史源码 SHA-256（旧核对点 7d3d951；并非当前 reviewed_commit�
 
 当前代码核对点源码 SHA-256：
 
-| 路径 | `08515f0` 内容 SHA-256 |
+| 路径 | `2cbfa39` 内容 SHA-256 |
 | --- | --- |
 | `project.godot` | `c28ee3ef9eaff9a96ff42d8943f5e705c00f99b25d2cfd05f71077bb5b9bed55` |
 | `shaders/CloudWeather.gd` | `432510b8bbb4cf934f692f521c7a74a874d79ab7c724329a77927f909ac2b468` |
@@ -427,6 +484,7 @@ V002 历史源码 SHA-256（旧核对点 7d3d951；并非当前 reviewed_commit�
 | `shaders/cloud_weather.gdshader` | `51a3ec1fb3d7ddd102961c50fc6a19d77d1567c55074af856f51a989d035681b` |
 | `shaders/cloud_sunlight.gdshader` | `2dc50839a36689d2edb27eafe077254d6675a6ed9a58d464bb139c4c967ae492` |
 | `shaders/low_poly.gdshader` | `640a7a9338e6dd0a6a0d0f477f53c05c2deed3dfda7dc02641b81673b448e399` |
+| `template/Piece/Piece.cs` | `952a8bf99fb249e66cd68f7d80fb535e9b0f583b50aa4c37ddbcf9a49fde534c` |
 
 本机证据逻辑位置及摘要哈希如下。原始日志、截图和测试脚本仅属于 LOCAL_ARTIFACT，没有写入仓库，也没有依赖合作者无法访问的绝对路径：
 
@@ -437,17 +495,18 @@ V002 历史源码 SHA-256（旧核对点 7d3d951；并非当前 reviewed_commit�
 | H003 | `clouds/round-7-altitudes/validation-summary.json` | `99f927434b09f183b2494406ea18c17d6d94eaeda0d7de9ae53956aaac0dc061` |
 | H004 | `clouds/round-8-cloud-cadence/validation-summary.json` | `8dd677aba904479ae42a655613e6cd9b6ceae57ef70c1f97474d69a2f86adaf6` |
 | H005 | `clouds/round-9-cleanup/validation-summary.json` | `0103fb0e9558891801338f77833e3650a6491b6ee0784874e996e6c9f8f707ed` |
+| H006 | `clouds/round-10-lifecycle-fixes/validation-summary.json` | `398558b7ea2295b03c339f3bb97ab4662925f4e32faa266270ddb910ad02d33d` |
 
 H003 的近／远景 GPU 总耗时约 8.9/11.6 ms，属于旧 60 FPS 上限条件。H004/H005 是恢复主支设置后的运行记录，不能把两类条件下的数字直接等同。间歇视口的 GPU 查询可能保留旧值，早期 benchmark.json 的更新计数与派生总耗时不采信；更新频率另由云时钟变化、实际绘制次数和图像变化确认。
 
-完整项目一致性限制：历史预览使用的 Piece.cs 清理仍是本地排除项，程序集包含它。当前只将与实际源码和条件一致的云模块检查列为实施阶段结果，不将其扩写成纯提交版、所有玩法、其他设备或合作者分支已回归通过。
+版本一致性：H004/H005 当时使用的 Piece.cs 修复在那次云推送中仍被排除，现由 A010 授权作为 C009 纳入分支。V005 的生产源码已核对到本轮代码提交，只有隔离测试脚本额外加入；旧记录仍保留原版本与条件，不反推全部玩法、其他设备或合作者分支已回归通过。
 
 <a id="collaboration"></a>
 ## 合作接入检查与范围限制
 
 | 检查项 | 已确认事实 | 后续接入要求 |
 | --- | --- | --- |
-| 玩法与数据 | 已提交净差异没有 .cs、.csproj、.sln、Map/、world/UI/ 或 template/ 内的变化。 | 合并后仍按目标版本检查选中、移动、攻击提示和相机操作。 |
+| 玩法与数据 | 新增 C009 的共用 Piece 生命周期清理与 C010 的空资源删除；.csproj、.sln、Map/、world/UI/ 和业务规则没有改动。 | 本轮已复核技能释放、面板切换和单位死亡；其他完整玩法仍按目标版本验收。 |
 | 项目与依赖 | project.godot 与固定起点逐字节一致；渲染模式、SDK 与依赖未改。 | 若对方更换投影、渲染方式或模型高度，重新核对云显示假设。 |
 | 共用材质 | 云影路径和云时钟绑定变化，其他地表公式保持原样。 | 核对共享 uniform、噪声和初始化时序，不能仅按文本无冲突判断。 |
 | 世界缓存范围 | 仍固定，范围外直接计算；没有改成相机跟随。 | 保持 A002 的暂缓边界；C007 的屏幕视线缓存另行随相机更新。 |
@@ -460,12 +519,10 @@ H003 的近／远景 GPU 总耗时约 8.9/11.6 ms，属于旧 60 FPS 上限条�
 
 | 项目 | 核对状态／归属 | 处理 |
 | --- | --- | --- |
-| template/Piece/Piece.cs | 本地既有修改，未暂存 | 单位销毁时释放未挂树技能节点，不归入云提交。 |
-| template/tile/GrassWindNoise.tres | 本地既有删除，未暂存 | 已提交对象为零字节；本轮保留删除现场，不混入云提交。 |
 | AGENTS.md | IGNORED | 正文未跟踪，继续只保留本地。 |
-| docs/branch-reports/codex-realistic-clouds.md | REPORT_ONLY；UPDATED_NOT_USER_REVIEWED | 本次按 A009 与既有维护约定更新后单独提交；保留代码核对点 08515f0。 |
+| docs/branch-reports/codex-realistic-clouds.md | REPORT_ONLY；UPDATED_NOT_USER_REVIEWED | 本次按 A010 更新并独立提交，代码核对点为 2cbfa39。 |
 
-两项既有已跟踪工作区差异的 `git diff --binary` SHA-256 仍为 `471cb73f0d640b4fdb98b69085453faedb385690c6d54a89eedb5ceab8965a6e`，与初版报告时一致。本次提交／推送不包含这些差异。
+此前列作本地排除项的 Piece.cs 和 GrassWindNoise.tres 差异，现已按 A010 作为 C009/C010 提交；不再记为未提交现场。本次没有纳入其他工作区内容，测试脚本、日志和隔离副本均不进入 Git。
 
 <a id="decisions"></a>
 ## 待决定事项与报告更新
@@ -473,11 +530,11 @@ H003 的近／远景 GPU 总耗时约 8.9/11.6 ms，属于旧 60 FPS 上限条�
 | 事项 | 当前状态 | 下一步 |
 | --- | --- | --- |
 | 初版报告审阅 | USER_REVIEWED，A006 | 保留历史审阅事实；本次扩展未被追认成已单独审阅。 |
-| 当前版本提交／推送 | EXPLICITLY_APPROVED，A009 | 提交现有云版本并更新报告，不包含排除项或主分支合并。 |
+| 当前两项改进提交／推送 | EXPLICITLY_APPROVED，A010 | 技能释放和空资源删除已作为独立质量修复提交，更新报告后推送；不包含 AGENTS.md 正文或主分支合并。 |
 | C004 全局帧率策略 | WITHDRAWN，A007 | 当前文件恢复起点，已退出候选，无需再决定保留旧 60 FPS 键。 |
 | 合作者最新模块的兼容 | NOT_ASSESSED | 准备接入对应版本时核对共用文件及参数依赖。 |
-| 纯提交版完整运行回归 | NOT_RUN_THIS_REVIEW | 云实施阶段已有本机隔离证据，完整纯提交版验收仍需另行明确版本与环境。 |
+| 当前版本验证 | RUNTIME_CHECKED，V005 | 已完成最新生产源码的隔离构建、导入、120 帧演示及三类生命周期检查；全部玩法与其他设备未包含在本轮验收中。 |
 
 维护时机：仅在用户明确要求 commit／push 时，在执行前集中汇总实际内容并更新本报告；日常开发、调试、验证和交付不要求同步维护。用户另行要求查看、生成或修订时按其指令处理。
 
-维护时保持 C001～C008 编号及报告路径稳定，新增行为使用新编号，撤回项保留历史并退出候选。reviewed_commit 只承诺已核对代码；后续仅改本报告的 REPORT_ONLY 提交可保留此值，出现其他路径变化时在下一次维护中补充核对。不得把旧运行、旧授权或旧主分支观察值无条件沿用。
+维护时保持 C001～C010 编号及报告路径稳定，新增行为使用新编号，撤回项保留历史并退出候选。reviewed_commit 只承诺已核对代码；后续仅改本报告的 REPORT_ONLY 提交可保留此值，出现其他路径变化时在下一次维护中补充核对。不得把旧运行、旧授权或旧主分支观察值无条件沿用。
