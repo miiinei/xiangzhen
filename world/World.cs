@@ -431,7 +431,7 @@ private void SpawnPiece(Vector2I gridPosition, PackedScene pieceScene)
 
     private void UpdateCameraTransform()
     {
-        float isometricOffset = _cameraDistance / HexGeometry.SqrtThree;
+        float isometricOffset = (MaxCameraDistance + BaseCameraSize) / HexGeometry.SqrtThree;
         _camera.Position = _cameraTarget + new Vector3(isometricOffset, isometricOffset, isometricOffset);
         _camera.LookAt(_cameraTarget);
         RefreshThingHealthBars();

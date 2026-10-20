@@ -32,6 +32,7 @@ PathPreviewWidth = 0.08
 DefaultBodyColor = Color(0.85, 0.45, 0.18, 1)
 
 [node name="BodyMesh" type="MeshInstance3D" parent="." index="0" unique_id=1985743193]
+cast_shadow = 2
 material_override = SubResource("StandardMaterial3D_body")
 mesh = SubResource("CylinderMesh_body")
 

@@ -31,21 +31,26 @@ projection = 1
 size = 20.0
 
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=300118188]
-transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
+rotation_degrees = Vector3(-40, -30, 0)
 shadow_enabled = true
+shadow_bias = 0.2
+shadow_normal_bias = 2.0
+shadow_blur = 0.05
+directional_shadow_mode = 2
+directional_shadow_max_distance = 85.0
 
-[node name="CloudLayer" type="MeshInstance3D" parent="."]
-position = Vector3(16, 7, 14)
+[node name="CloudLayer" type="MeshInstance3D" parent="." unique_id=1439917044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 7, 14)
+material_override = ExtResource("6_cloud")
 cast_shadow = 0
 mesh = SubResource("PlaneMesh_cloud")
-material_override = ExtResource("6_cloud")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1471986509]
 environment = SubResource("Environment_world")
 
 [node name="UILayer" type="CanvasLayer" parent="." unique_id=1291268449]
 
-[node name="BuildPanel" parent="UILayer" instance=ExtResource("5_build_panel")]
+[node name="BuildPanel" parent="UILayer" unique_id=1509132154 instance=ExtResource("5_build_panel")]
 
 [node name="EndTurnLayer" type="CanvasLayer" parent="." unique_id=1310966578]
 
