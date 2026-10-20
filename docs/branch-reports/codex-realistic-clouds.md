@@ -1,23 +1,25 @@
 ---
 schema_version: 1
-report_status: USER_REVIEWED
-report_reviewed_on: 2026-10-20
-report_approval_ref: A006
+report_status: UPDATED_NOT_USER_REVIEWED
+report_reviewed_on: null
+report_approval_ref: null
+prior_report_approval_ref: A006
 branch: codex/realistic-clouds
 base_ref: master
 base_commit: d6b1545b527bd8165b8a6c1e8b4817ec695828bc
-reviewed_commit: ab989dd380733573dafc7f6a993e80c36f26b735
+reviewed_commit: 08515f05f49fa0ea771b39f145d97514132cd6a2
 target_ref: origin/master
 target_observed_commit: d6b1545b527bd8165b8a6c1e8b4817ec695828bc
-remote_branch_observed_commit: ab989dd380733573dafc7f6a993e80c36f26b735
+remote_branch_observed_commit: b601af16cbcfb6fbafc203f69fdb732e9dff8b81
+remote_observation_phase: PRE_PUSH
 checked_on: 2026-10-20
 timezone: Asia/Shanghai
 comparison: base_commit..reviewed_commit
-scope: COMMITTED_NET_DIFF
-changed_file_count: 20
-insertions: 856
-deletions: 76
-post_base_commit_count: 4
+scope: COMMITTED_NET_DIFF_EXCLUDING_REPORT
+changed_file_count: 23
+insertions: 1063
+deletions: 167
+post_base_commit_count: 8
 post_base_merge_commit_count: 0
 upstream_sync_status: NO_POST_BASE_MAINLINE_UPDATE_OBSERVED
 runtime_validation_this_review: NOT_RUN
@@ -26,7 +28,7 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 
 # 云开发分支变更报告
 
-本报告内容已经用户审阅，见 [A006](#a006)。统计覆盖固定起点到 `reviewed_commit` 的 20 个已提交变更文件，不包含报告自身的后续提交；仅修改本报告的提交归为 `REPORT_ONLY`，可以保留该代码核对点。本地未提交改动见 [本地排除项](#local-only)。`checked_on` 和远端观察值记录核对时的状态，不表示主分支或报告提交后的分支指针永久不变。
+本报告在 A006 已审阅的初版基础上，按 A009 的本次推送要求更新；本次新增内容尚未经用户单独审阅，记录为 `UPDATED_NOT_USER_REVIEWED`，不据此要求重复确认已授权的提交／推送。统计覆盖固定起点到 `reviewed_commit` 的 23 个非报告变更文件；完整文件索引另列报告自身，合计 24 个路径。本地未提交改动见 [本地排除项](#local-only)。远端观察值在本次推送前读取，不代表推送后的分支指针。
 
 导航：[字段约定](#schema) · [模块索引](#modules) · [完整文件索引](#files) · [额外授权索引](#permissions) · [引入依赖](#integration) · [变更条目](#changes) · [提交索引](#commits) · [授权证据](#approvals) · [验证证据](#validation) · [协作检查](#collaboration) · [本地排除项](#local-only) · [待决定事项](#decisions)
 
@@ -37,12 +39,13 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 
 | 字段 | 允许值及含义 |
 | --- | --- |
-| `report_status` / `report_approval_ref` | `USER_REVIEWED` 表示用户已审阅报告内容，对应记录为 A006；不代表 C004 的全局策略获批，也不代表分支合并或运行验收通过。 |
+| `report_status` / `report_approval_ref` | `USER_REVIEWED` 表示对应版本已获用户审阅；`UPDATED_NOT_USER_REVIEWED` 表示本次更新尚未单独审阅。A006 保留为初版审阅记录，A009 授权本轮提交／推送；两者均不代表合并或完整运行验收。 |
+| `status` | `ACTIVE` 为当前有效变化，省略时按此值处理；`WITHDRAWN` 为已撤回、退出当前引入候选的历史条目，编号不复用。 |
 | `impact_type` | `MODULE_LOCAL` 模块内部；`SHARED_INTEGRATION` 共用接线；`PROJECT_GLOBAL` 项目级运行行为；`DOCUMENTATION` 文档与来源记录；`DEVELOPMENT_WORKFLOW` 开发工具的项目约定。 |
 | `requires_extra_approval` | `true` 表示按当前本地约定需要额外明确批准；`false` 表示本条位于已授权任务范围内。不能由此判断验证是否通过。 |
 | `approval_status` | `IN_SCOPE` 已有任务范围覆盖；`EXPLICITLY_APPROVED` 找到对应明确要求；`UNCONFIRMED` 额外授权证据尚未确认，不等同于断言从未批准。 |
 | `integration_mode` | `INDEPENDENT` 可独立审阅／选择引入的候选；`WITH_DEPENDENCIES` 应按指定依赖组引入；`REVIEW_REQUIRED` 需要单独决定。均不表示已批准合并。 |
-| `validation_status` | `NOT_RUN` 本次未验证；`STATIC_CHECKED` 本次核对源码、差异或 Git 行为；`RUNTIME_CHECKED` 对明确版本实际运行验证。本报告各项为 `STATIC_CHECKED`，历史运行记录另列。 |
+| `validation_status` | `NOT_RUN` 本次未验证；`STATIC_CHECKED` 本次核对源码、差异或 Git 行为；`RUNTIME_CHECKED` 对明确版本实际运行验证。本次提交准备以 `STATIC_CHECKED` 核对实际源码和 Git 范围，实施阶段的运行结果按 H001～H005 单独记录。 |
 | `origin` | `THIS_BRANCH` 本开发分支引入；`UPSTREAM_SYNC` 主分支同步；`LOCAL_ONLY` 工作区独有。当前已提交条目均为 `THIS_BRANCH`。 |
 | `approval_refs` / `validation_refs` | 指向本报告的 `Axxx` / `Vxxx` / `Hxxx` 证据编号；缺失的原始证据不得用助手结论或提交说明替代。 |
 | `depends_on` / `integration_group` | 条目依赖与配套引入组；组内文件不按单文件复制作为默认接入方式。 |
@@ -55,11 +58,13 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 | 模块 | 条目 | 入口 |
 | --- | --- | --- |
 | 云场、体积渲染与噪声 | [C001](#c001) | `cloud_band_density()`、`march_cloud_band()`、云材质与三份噪声资源 |
-| 布局初始化与共享缓存 | [C002](#c002) | `CloudWeather._enter_tree()`、`_create_weather_map()`、`_create_sunlight_map()` |
+| 布局初始化与世界场缓存 | [C002](#c002) | `_enter_tree()`、云量与太阳透射缓存；更新节奏见 C007 |
 | 地表／单位云影与场景接线 | [C003](#c003) | `low_poly.fragment()`、`Camera3D/CloudLayer`、`CloudWeather` 节点 |
-| 项目帧率策略 | [C004](#c004) | `application/run/max_fps` |
-| 参数说明与来源 | [C005](#c005) | README 顶部“写实云更新”；四个开源参考的固定版本记录 |
+| 已撤回的项目帧率策略 | [C004](#c004) | `project.godot` 已逐字节恢复起点；原 FPS 键已移除 |
+| 参数说明与来源 | [C005](#c005) | README 当前实现、参数与接入；四个开源参考的固定版本记录 |
 | 本地规则文件的 Git 忽略 | [C006](#c006) | `.gitignore` 的 `/AGENTS.md` |
+| 云层独立更新与视线缓存 | [C007](#c007) | `_process()`、`_update_view()`、`cloud_view.gdshader`、`cloud_time()` |
+| 缓存初始化与参数组织整理 | [C008](#c008) | `_create_cache_material()`、`_create_cache_viewport()`、最终显示参数归属 |
 
 <a id="files"></a>
 ## 完整文件索引
@@ -67,51 +72,56 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 | 状态 | 文件 | 新增／删除 | 条目 | 稳定定位点 |
 | --- | --- | --- | --- | --- |
 | M | [.gitignore](../../.gitignore) | 3 / 0 | [C006](#c006) | `/AGENTS.md` |
-| M | [project.godot](../../project.godot) | 1 / 0 | [C004](#c004) | `[application] run/max_fps` |
-| A | [shaders/CLOUDS_LICENSES.md](../../shaders/CLOUDS_LICENSES.md) | 115 / 0 | [C005](#c005) | 四个来源与参考版本 |
-| A | [shaders/CloudWeather.gd](../../shaders/CloudWeather.gd) | 96 / 0 | [C002](#c002) | `_enter_tree()`、`_ready()`、缓存创建与绑定函数 |
+| A | [shaders/CLOUDS_LICENSES.md](../../shaders/CLOUDS_LICENSES.md) | 115 / 0 | [C005](#c005) | 四个来源、固定版本和 MIT 原文 |
+| A | [shaders/CloudWeather.gd](../../shaders/CloudWeather.gd) | 216 / 0 | [C002](#c002)、[C007](#c007)、[C008](#c008) | 模板绑定、三份缓存、独立时钟与共用初始化 |
 | A | [shaders/CloudWeather.gd.uid](../../shaders/CloudWeather.gd.uid) | 1 / 0 | [C002](#c002) | Godot 脚本 UID |
-| M | [shaders/README.md](../../shaders/README.md) | 84 / 4 | [C005](#c005) | 顶部写实云说明、当前参数表、缓存限制 |
-| M | [shaders/StylePreview.tscn](../../shaders/StylePreview.tscn) | 21 / 10 | [C003](#c003) | `Camera3D/CloudLayer`、`CloudWeather`、内联接收材质 |
-| A | [shaders/cloud_base_noise.tres](../../shaders/cloud_base_noise.tres) | 14 / 0 | [C001](#c001) | `NoiseTexture3D`、`FastNoiseLite_base` |
-| M | [shaders/cloud_field.gdshaderinc](../../shaders/cloud_field.gdshaderinc) | 258 / 33 | [C001](#c001) | `cloud_band_density()`、`cloud_shadow()`、共享 uniform |
-| M | [shaders/cloud_layer.gdshader](../../shaders/cloud_layer.gdshader) | 183 / 11 | [C001](#c001) | `march_cloud_band()`、`fragment()`、`camera_plane_distance` |
-| M | [shaders/cloud_layer.tres](../../shaders/cloud_layer.tres) | 8 / 2 | [C001](#c001) | 两份 3D 噪声绑定、`render_priority` |
-| M | [shaders/cloud_noise.tres](../../shaders/cloud_noise.tres) | 2 / 2 | [C001](#c001) | `frequency`、`fractal_octaves` |
-| A | [shaders/cloud_sunlight.gdshader](../../shaders/cloud_sunlight.gdshader) | 16 / 0 | [C002](#c002) | `fragment()`、太阳透射 RGB 通道 |
+| M | [shaders/README.md](../../shaders/README.md) | 105 / 94 | [C005](#c005)、[C007](#c007)、[C008](#c008) | 当前参数、更新节奏、接入与成本 |
+| M | [shaders/StylePreview.tscn](../../shaders/StylePreview.tscn) | 21 / 10 | [C003](#c003) | 相机子节点 CloudLayer、CloudWeather 和内联材质 |
+| A | [shaders/cloud_base_noise.tres](../../shaders/cloud_base_noise.tres) | 14 / 0 | [C001](#c001) | 96³ Perlin 主体噪声 |
+| M | [shaders/cloud_field.gdshaderinc](../../shaders/cloud_field.gdshaderinc) | 266 / 33 | [C001](#c001)、[C007](#c007) | 密度、完整云影与 `cloud_time()` |
+| M | [shaders/cloud_layer.gdshader](../../shaders/cloud_layer.gdshader) | 130 / 12 | [C001](#c001)、[C007](#c007)、[C008](#c008) | 实时深度、缓存重新投放和最终显示参数 |
+| M | [shaders/cloud_layer.tres](../../shaders/cloud_layer.tres) | 8 / 2 | [C001](#c001) | 三维噪声绑定、透明绘制优先级 |
+| M | [shaders/cloud_noise.tres](../../shaders/cloud_noise.tres) | 2 / 2 | [C001](#c001) | 水平天气噪声的频率与倍频数 |
+| A | [shaders/cloud_optics.gdshaderinc](../../shaders/cloud_optics.gdshaderinc) | 81 / 0 | [C001](#c001)、[C007](#c007)、[C008](#c008) | 共用的视线积分与采样参数 |
+| A | [shaders/cloud_optics.gdshaderinc.uid](../../shaders/cloud_optics.gdshaderinc.uid) | 1 / 0 | [C007](#c007) | Godot include UID |
+| A | [shaders/cloud_sunlight.gdshader](../../shaders/cloud_sunlight.gdshader) | 16 / 0 | [C002](#c002) | 完整云场的太阳透射 RGB 通道 |
 | A | [shaders/cloud_sunlight.gdshader.uid](../../shaders/cloud_sunlight.gdshader.uid) | 1 / 0 | [C002](#c002) | Godot 着色器 UID |
-| A | [shaders/cloud_volume_noise.tres](../../shaders/cloud_volume_noise.tres) | 17 / 0 | [C001](#c001) | `NoiseTexture3D`、`FastNoiseLite_volume` |
-| A | [shaders/cloud_weather.gdshader](../../shaders/cloud_weather.gdshader) | 15 / 0 | [C002](#c002) | `fragment()`、两层云量 RG/BA 通道 |
+| A | [shaders/cloud_view.gdshader](../../shaders/cloud_view.gdshader) | 29 / 0 | [C007](#c007) | 两层预乘颜色／透明度图集 |
+| A | [shaders/cloud_view.gdshader.uid](../../shaders/cloud_view.gdshader.uid) | 1 / 0 | [C007](#c007) | Godot 着色器 UID |
+| A | [shaders/cloud_volume_noise.tres](../../shaders/cloud_volume_noise.tres) | 17 / 0 | [C001](#c001) | 96³ cellular 云泡与侵蚀噪声 |
+| A | [shaders/cloud_weather.gdshader](../../shaders/cloud_weather.gdshader) | 15 / 0 | [C002](#c002) | 上下层覆盖与云丝 RG/BA 通道 |
 | A | [shaders/cloud_weather.gdshader.uid](../../shaders/cloud_weather.gdshader.uid) | 1 / 0 | [C002](#c002) | Godot 着色器 UID |
-| M | [shaders/low_poly.gdshader](../../shaders/low_poly.gdshader) | 3 / 7 | [C003](#c003) | `fragment()` 的 `cloud_transmission` |
-| M | [shaders/low_poly.tres](../../shaders/low_poly.tres) | 7 / 2 | [C003](#c003) | 云场需要的两份 3D 噪声绑定 |
-| M | [world/world.tscn](../../world/world.tscn) | 10 / 5 | [C003](#c003) | `Camera3D/CloudLayer`、根节点下的 `CloudWeather` |
+| M | [shaders/low_poly.gdshader](../../shaders/low_poly.gdshader) | 3 / 7 | [C003](#c003) | `fragment()` 的云影接收 |
+| M | [shaders/low_poly.tres](../../shaders/low_poly.tres) | 7 / 2 | [C003](#c003) | 共用云场的三维噪声绑定 |
+| M | [world/world.tscn](../../world/world.tscn) | 10 / 5 | [C003](#c003) | `Camera3D/CloudLayer` 与 CloudWeather 节点 |
+| A | [docs/branch-reports/codex-realistic-clouds.md](codex-realistic-clouds.md) | 不计入代码统计 | `REPORT_ONLY` | 报告自身，随独立文档提交维护 |
 
-合计：20 个文件，856 行新增、76 行删除。当前报告自身及本地排除项不计入上述统计。
+代码统计：23 个文件，1063 行新增、167 行删除。另有报告自身 1 个路径，不参与代码增删统计。`project.godot` 已与固定起点逐字节一致，退出净差异文件表；其撤回历史仍保留在 C004。
 
 <a id="permissions"></a>
 ## 额外授权索引
 
 | 分类 | 条目 | 状态依据 |
 | --- | --- | --- |
-| 需要额外授权，独立证据待确认 | [C004](#c004) | `PROJECT_GLOBAL`；`UNCONFIRMED`；[A003](#a003) 只确认后续提交／推送要求。 |
-| 任务范围内的云实现 | [C001](#c001)、[C002](#c002) | [A001](#a001) 的云与云影目标；[A002](#a002) 的高度、密度及显示要求。 |
-| 任务范围内的必要共用接线 | [C003](#c003) | 只替换云影接收和云节点连接；未扩大为地表风格或玩法重做。 |
-| 配套文档 | [C005](#c005) | 云实现的参数、来源与限制记录。 |
-| 对应明确要求已确认 | [C006](#c006) | [A004](#a004) 明确要求忽略本地规则，并单独提交、推送忽略规则。 |
+| 已明确要求撤回的全局设置 | [C004](#c004) | `PROJECT_GLOBAL`；A007 明确要求恢复开发分支起点的主支设置，当前已撤回原 60 FPS 键。 |
+| 任务范围内的云实现、独立更新与整理 | [C001](#c001)、[C002](#c002)、[C007](#c007)、[C008](#c008) | A001、A002 确定云效果和缓存范围；A007 允许云单独降频，A008 要求在不影响性能的条件下清理。 |
+| 任务范围内的必要共用接线 | [C003](#c003) | 只涉及云影与云时钟接收，草风仍使用原生 TIME，未扩大为地表风格或玩法重做。 |
+| 配套文档 | [C005](#c005) | 参数、来源和当前实现说明，随云功能配套更新。 |
+| 本地约定的对应明确要求 | [C006](#c006) | A004 授权忽略规则单独提交；AGENTS.md 正文继续只保留在本地。 |
+| 本轮提交／推送 | 当前两笔代码提交及报告更新 | A009 授权推送当前版本；不包含本地排除项和主分支合并。 |
 
-本索引按当前本地协作约定分类。它不追溯宣告历史实现“未经任何授权”，也不授权回滚现有设置。
+原 C004 添加时的事前独立批准仍记为未确认；本次明确撤回不追溯改写该历史。
 
 <a id="integration"></a>
 ## 引入依赖索引
 
 | 组／候选 | 条目 | 引入边界 |
 | --- | --- | --- |
-| `G001` 云功能配套组 | [C001](#c001)、[C002](#c002)、[C003](#c003)、[C005](#c005) | 云场接口、资源、控制器、接收材质、场景和来源说明配套处理。当前未核对合作者其他开发分支。 |
-| 独立候选 | [C006](#c006) | 由 `ab989dd` 单独引入，仅修改 `.gitignore`。仍需确认目标项目是否采用相同的本地规则约定。 |
-| 单独决定 | [C004](#c004) | 全局帧率设置在代码上可与云功能区分，但它与云优化同在 `7d3d951` 提交中；整次选择该提交会同时带入 FPS 设置。 |
+| `G001` 云功能配套组 | C001、C002、C003、C005、C007、C008 | 云场、噪声、控制器、三份缓存、共用积分、接收材质、场景和说明配套引入；新的云层 shader 会读取视线缓存，不能只复制单个文件。 |
+| 独立候选 | C006 | `ab989dd` 仅修改 `.gitignore`，按目标项目的本地规则约定审阅。 |
+| 已撤回，退出候选 | C004 | `7d3d951` 添加全局上限；`d9557f2` 已单独移除。当前分支末端的 `project.godot` 与固定起点完全一致。 |
 
-当前三个云提交不能直接等同于“排除 C004 的 G001”：`7d3d951` 混有云实现、说明和帧率设置。若决定排除 FPS 变化，应另行审阅所需差异，并验证得到的组合，不自动重写已共享历史。
+选择历史 `7d3d951` 时仍会带入旧 FPS 键；选择当前云版本时应同时包含其后续恢复与独立更新提交，或审阅相应净差异。本次没有重写历史，也没有合并主分支。
 
 <a id="changes"></a>
 ## 变更条目
@@ -125,13 +135,13 @@ origin: THIS_BRANCH
 impact_type: MODULE_LOCAL
 requires_extra_approval: false
 approval_status: IN_SCOPE
-approval_refs: [A001, A002]
-source_commits: [5731b0a, 799da11, 7d3d951]
+approval_refs: [A001, A002, A007, A008]
+source_commits: [5731b0a, 799da11, 7d3d951, 08515f0]
 integration_mode: WITH_DEPENDENCIES
 integration_group: G001
 depends_on: [C005]
 validation_status: STATIC_CHECKED
-validation_refs: [V001, V002, H001, H002, H003]
+validation_refs: [V001, V002, H001, H002, H003, V004, H004, H005]
 ```
 
 | 起点版本 | 当前版本 |
@@ -149,8 +159,10 @@ validation_refs: [V001, V002, H001, H002, H003]
 
 接口依赖：旧 `cloud_density(vec2)` 已移除；旧版 `low_poly` 仍调用该函数，因此新云场不能与未适配的旧接收着色器混用。配套更新见 [C003](#c003)。当前深度重建及缩放逻辑针对 GL Compatibility 和正交俯视相机，未验证其他投影／渲染模式。
 
+当前可见积分由 `cloud_optics.gdshaderinc` 共用；常规像素读取 C007 的视线缓存，缓存余量之外或物体表面进入该高度带时保留直接积分。最终透明度、近景单位保护和背景云丝参数仍位于 `cloud_layer.gdshader`。
+
 <a id="c002"></a>
-### C002 — 布局初始化与两份共享缓存
+### C002 — 布局初始化与世界场缓存
 
 ```yaml
 module: cloud_runtime
@@ -158,27 +170,27 @@ origin: THIS_BRANCH
 impact_type: MODULE_LOCAL
 requires_extra_approval: false
 approval_status: IN_SCOPE
-approval_refs: [A001, A002]
-source_commits: [5731b0a, 799da11, 7d3d951]
+approval_refs: [A001, A002, A007, A008]
+source_commits: [5731b0a, 799da11, 7d3d951, 08515f0]
 integration_mode: WITH_DEPENDENCIES
 integration_group: G001
 depends_on: [C001]
 validation_status: STATIC_CHECKED
-validation_refs: [V001, V002, H002, H003]
+validation_refs: [V001, V002, V004, H002, H003, H004, H005]
 ```
 
-起点无 `CloudWeather` 脚本或这两份缓存。当前连接如下：
+起点没有 CloudWeather 和两份世界场缓存。当前连接如下，第三份视线缓存见 C007：
 
 | 生产端 | 输出 | 消费端 |
 | --- | --- | --- |
-| `CloudWeather._enter_tree()` | 本局 `cloud_weather_origin`；`weather_seed=0` 时随机，非零时可复现布局。使用独立 RNG 实例。 | 云与 `low_poly` 模板；工厂后续生成的地块／单位材质副本。 |
-| `cloud_weather.gdshader` + `CloudCoverage` SubViewport | 512×512；RG 为下层云量与云丝包络，BA 为上层；每帧更新。 | 可见云、光照积分及阴影的水平天气场查询。 |
-| `cloud_sunlight.gdshader` + `CloudSunlight` SubViewport | 256×256；R/G 为下／上层地面透射，B 为上层向下层透射；每帧更新。 | 地表／单位云影及下层云受光。 |
-| `CloudWeather._ready()` | 对预览场景内联接收材质绑定相同原点和缓存。 | 独立美术预览。 |
+| `CloudWeather._enter_tree()` | 本局 weather_origin；weather_seed=0 随机，非零可复现，使用独立 RNG。 | 云和 low_poly 模板，以及工厂后续创建的材质副本。 |
+| `cloud_weather.gdshader` / CloudCoverage | 512×512；RG 为下层覆盖和云丝，BA 为上层；按 C007 的 20 Hz 节奏更新。 | 可见密度、自遮光及阴影的水平天气查询。 |
+| `cloud_sunlight.gdshader` / CloudSunlight | 256×256；R/G 为下／上层地面透射，B 为上层向下层透射；同节奏更新。 | 地表、单位云影及下层云受光。 |
+| `_ready()` | 对预览内联材质绑定同一原点、时钟和缓存。 | 独立美术预览。 |
 
-缓存范围：原点 `(-48,-48)`，跨度 `(128,128)`；范围固定，不随相机移动。范围外回到直接计算，云不会因此消失，但 GPU 开销可能上升。保持固定范围符合 [A002](#a002) 的明确暂缓要求。
+两份世界场缓存仍固定覆盖 (-48,-48) 至 (80,80)，不随相机移动。范围外继续直接计算，不清空云；保持 A002 的暂缓边界。C007 随相机更新的是屏幕视线缓存，未扩大上述世界缓存。
 
-参数一致性：初始化从云模板复制覆盖值。以后动态调节云形、风或太阳参数时，需同时同步云材质、接收材质、`_weather_material` 和 `_sunlight_material`；当前无自动传播全部后续参数变化的公共控制接口。复现画面需要同时控制种子、时间和相机。
+初始化从云模板复制覆盖值。以后动态调云形、风或太阳时，需同步云材质、接收材质、_weather_material、_sunlight_material 和 _view_material；当前没有自动传播全部后续参数的公共接口。复现需同时控制种子、时间和相机。
 
 <a id="c003"></a>
 ### C003 — 共用材质及场景接线
@@ -189,13 +201,13 @@ origin: THIS_BRANCH
 impact_type: SHARED_INTEGRATION
 requires_extra_approval: false
 approval_status: IN_SCOPE
-approval_refs: [A001, A002]
-source_commits: [5731b0a]
+approval_refs: [A001, A002, A007, A008]
+source_commits: [5731b0a, 08515f0]
 integration_mode: WITH_DEPENDENCIES
 integration_group: G001
 depends_on: [C001, C002]
 validation_status: STATIC_CHECKED
-validation_refs: [V001, V002, H003]
+validation_refs: [V001, V002, H003, V004, H004, H005]
 ```
 
 | 定位 | 修改前 | 修改后及影响 |
@@ -210,31 +222,30 @@ validation_refs: [V001, V002, H003]
 
 协作交集：接收着色器、材质模板、两个场景均属于需与其他模块共同核对的文件。`World.cs` 的相机移动／缩放代码未修改；新增相机子节点仍会使其他相机方案与云显示存在集成依赖。
 
+C007 的共享时钟纹理在 C# 工厂复制模板前绑定，副本因此使用同一云时刻；草风原生 `TIME` 和其他地表公式不随云降频。
+
 <a id="c004"></a>
-### C004 — 全局 60 FPS 上限
+### C004 — 已撤回的全局 60 FPS 上限
 
 ```yaml
 module: project_runtime_settings
+status: WITHDRAWN
 origin: THIS_BRANCH
 impact_type: PROJECT_GLOBAL
 requires_extra_approval: true
-approval_status: UNCONFIRMED
-approval_refs: [A003]
-source_commits: [7d3d951]
-integration_mode: REVIEW_REQUIRED
+approval_status: EXPLICITLY_APPROVED
+approval_refs: [A003, A007]
+source_commits: [7d3d951, d9557f2]
+integration_mode: INDEPENDENT
 integration_group: null
 depends_on: []
 validation_status: STATIC_CHECKED
-validation_refs: [V001, H002, H003]
+validation_refs: [V001, V004, H004, H005]
 ```
 
-精确差异：`project.godot` 的 `[application]` 新增 `run/max_fps=60`。起点未设置此键；这不代表起点实际渲染帧率一定不受 VSync 等条件限制。
+历史 `7d3d951` 在 [application] 添加 run/max_fps=60，影响整个项目。原添加方案的事前独立批准未确认，A003 的后续 Git 授权不追溯替代它。
 
-影响：整个项目的默认渲染帧率上限，包括其他场景和模块；隐藏云不会移除此设置。它不是云内部采样预算，也不等同于物理更新频率。
-
-授权核对：[A003](#a003) 明确允许把性能优化与高度等调整提交／推送；本次读取的历史中，没有确认到独立的、实施前针对全局 60 FPS 方案的明确批准。记录为 `UNCONFIRMED`，不从提交说明或助手完成答复反推授权。
-
-待决定：共同版本是否保留该全局策略。该决定不由本报告自动作出；目前代码保持原样，也未执行回滚。
+用户现已在 A007 明确要求恢复开发分支起点的主支设置；`d9557f2524c5e72b71c5e0e493ff06a3e9eb9a4b` 单独删除该键。当前 project.godot 与 `d6b1545b527bd8165b8a6c1e8b4817ec695828bc` 中的文件逐字节相同，VSync、分辨率、渲染模式和物理设置沿用起点。此条退出当前引入候选，编号保留；实际帧率仍受原有 VSync、显示器与硬件条件影响。
 
 <a id="c005"></a>
 ### C005 — 参数说明与开源来源记录
@@ -245,18 +256,18 @@ origin: THIS_BRANCH
 impact_type: DOCUMENTATION
 requires_extra_approval: false
 approval_status: IN_SCOPE
-approval_refs: [A001, A002]
-source_commits: [5731b0a, 799da11, 7d3d951]
+approval_refs: [A001, A002, A007, A008]
+source_commits: [5731b0a, 799da11, 7d3d951, 08515f0]
 integration_mode: WITH_DEPENDENCIES
 integration_group: G001
 depends_on: []
 validation_status: STATIC_CHECKED
-validation_refs: [V001]
+validation_refs: [V001, V004, H005]
 ```
 
 新增 `CLOUDS_LICENSES.md`，记录 Clay John、MangoButtermilch、Sebastian Lague、Valerie Bettaque 四个参考项目的固定版本、参考范围和 MIT 原文。现有实现没有把它们的插件、天空系统或素材包作为新增项目依赖导入。
 
-README 顶部补充当前两层云、缓存、缩放、云影、默认值及性能条件。其后保留历史草原说明，旧段落中的旧默认值不能作为当前云参数依据；读取顺序以顶部当前更新为准。文档与来源说明随 G001 一起保留。
+README 统一说明当前两层云、三份缓存、独立更新、默认值及接入条件，移除多代方案互相覆盖的旧云参数。地表现有材质接入和参数说明仍保留；代码清理阶段文档从 185 行整理为 114 行。来源许可文件未改动，文档与来源说明随 G001 配套保留。
 
 <a id="c006"></a>
 ### C006 — 忽略本地 AI 工作约定
@@ -280,6 +291,54 @@ validation_refs: [V001, V003]
 
 提交 `ab989dd` 只包含 `.gitignore`。规则文件实际内容未进入提交；已跟踪的其他文件也不因这条规则被取消跟踪。当前分支报告位于正常项目路径，不属于该忽略项。
 
+<a id="c007"></a>
+### C007 — 云层独立更新与视线缓存
+
+```yaml
+module: cloud_update_cadence
+origin: THIS_BRANCH
+impact_type: MODULE_LOCAL
+requires_extra_approval: false
+approval_status: IN_SCOPE
+approval_refs: [A007]
+source_commits: [08515f0]
+integration_mode: WITH_DEPENDENCIES
+integration_group: G001
+depends_on: [C001, C002, C003, C005]
+validation_status: STATIC_CHECKED
+validation_refs: [V001, V004, H004, H005]
+```
+
+此前主视口每帧进行完整云体积分，两份世界场缓存也每帧重算。当前 CloudWeather.cloud_update_fps 默认 20：通过一张共享 1×1 RF 浮点纹理给材质副本提供同一 cloud_time，云形、光照与云影按实际累计秒数更新，漂移与演化速度不变。草风仍使用原生 TIME。
+
+cloud_view.gdshader 分别积分上下云带，在图集两半保存预乘颜色及透明度。cloud_resolution_scale 默认 0.75，按主视口宽高各 75% 的密度计算，四周额外 10% 平移余量；噪声资源、物理云厚、可见 24/16 步及自遮光预算不变。
+
+主视口每帧按当前正交视线重新投放缓存，读取实时场景深度并执行近景单位保护。常规平移不降低相机、棋子或 UI 的显示频率；缩放、旋转、窗口改变或大幅平移会立即刷新云体，因此这类操作可使云本体更新超过 20 Hz。缓存余量外或不透明表面进入某层高度时，保留按真实深度停止的直接积分；最近视角跳过云本体缓存，完整云影继续更新。背景云丝在实时合成中读取同一云时钟。
+
+本条只使用当前 GL Compatibility 的着色器和 SubViewport，不新增插件、全局 FPS 设置、Autoload 或项目级 shader globals。当前缓存投影适配既有正交相机，其他投影不使用视线缓存。
+
+<a id="c008"></a>
+### C008 — 初始化与参数组织清理
+
+```yaml
+module: cloud_code_organization
+origin: THIS_BRANCH
+impact_type: MODULE_LOCAL
+requires_extra_approval: false
+approval_status: IN_SCOPE
+approval_refs: [A008]
+source_commits: [08515f0]
+integration_mode: WITH_DEPENDENCIES
+integration_group: G001
+depends_on: [C002, C007]
+validation_status: STATIC_CHECKED
+validation_refs: [V001, V004, H005]
+```
+
+三份缓存共用 _create_cache_material() 和 _create_cache_viewport()，保留各自排除自身反馈纹理的规则、尺寸和更新模式。ColorRect 通过全尺寸锚点跟随视口，删除单独保存的 _view_surface 及每次手动同步尺寸的代码。
+
+将 9 个仅负责透明度、单位保护和背景云丝的参数放回 cloud_layer；cloud_optics 共用积分函数与必要调度参数。参数名、类型、默认值与计算函数内容保持一致，没有新增每帧积分或纹理采样。缓存之外和高物体遮挡的直接积分仍被使用，未当作旧代码删除。H005 四档视距的清理前后截图逐像素一致。文档整理归入 C005。
+
 <a id="commits"></a>
 ## 提交索引
 
@@ -287,10 +346,14 @@ validation_refs: [V001, V003]
 | --- | --- | --- |
 | `5731b0ae9ee11ac44ef8dffe51d6e2033b782579` | feat: add evolving volumetric clouds and shadows | C001、C002、C003、C005 |
 | `799da1183c1ef6b261e801d4d0a81a06ed58cbcd` | feat: add layered clouds and fix orthographic clipping | C001、C002、C005 |
-| `7d3d95165284adc4f9d584b13eb461ef0528825a` | perf: cache cloud coverage and tune cloud layers | C001、C002、C004、C005；混有全局 FPS 设置 |
-| `ab989dd380733573dafc7f6a993e80c36f26b735` | chore: ignore local AGENTS.md instructions | C006；单独文件提交 |
+| `7d3d95165284adc4f9d584b13eb461ef0528825a` | perf: cache cloud coverage and tune cloud layers | C001～C005；包含后来撤回的 FPS 键 |
+| `ab989dd380733573dafc7f6a993e80c36f26b735` | chore: ignore local AGENTS.md instructions | C006 |
+| `fb7e07815fa65a8892c15e6651b208fbf2b318c0` | docs: add reviewed cloud branch change report | REPORT_ONLY；初版报告 |
+| `b601af16cbcfb6fbafc203f69fdb732e9dff8b81` | docs: update branch report maintenance timing | REPORT_ONLY；报告维护时机 |
+| `d9557f2524c5e72b71c5e0e493ff06a3e9eb9a4b` | fix: restore mainline frame rate settings | C004；单独恢复项目配置 |
+| `08515f05f49fa0ea771b39f145d97514132cd6a2` | perf: update clouds independently and simplify cache setup | C001、C002、C003、C005、C007、C008 |
 
-固定起点为 `d6b1545b527bd8165b8a6c1e8b4817ec695828bc`。在所覆盖代码版本的核对时，远端 `master` 等于该提交，远端云分支等于 `reviewed_commit`；该范围内的 4 次提交没有合并提交。后续 `REPORT_ONLY` 提交会推进分支指针，但不改变上述 20 个文件的统计范围。以后目标分支前进或出现其他路径变化时，更新观察值并核对接入差异，不覆盖固定起点。
+固定起点为 `d6b1545b527bd8165b8a6c1e8b4817ec695828bc`。代码核对点范围内共 8 次提交，0 次合并提交；本次推送前观察的远端云分支为 `b601af16cbcfb6fbafc203f69fdb732e9dff8b81`，目标主支仍为固定起点。更新本报告的后续独立文档提交属于 REPORT_ONLY，保留上述 reviewed_commit，不要求报告记录包含自身内容的未知哈希。
 
 <a id="approvals"></a>
 ## 授权证据索引
@@ -315,21 +378,33 @@ validation_refs: [V001, V003]
 <a id="a006"></a>
 **A006 — 报告审阅确认与单独提交／推送授权。** 来源：同一当前任务，2026-10-20 用户消息。原话：“可以，报告按这版来，把待审草稿状态更新后，单独提交并 push 到当前开发分支。”类型为 `REPORT_REVIEW_AND_GIT_ACTION`，仅覆盖本报告的状态更新及单独提交／推送；不扩大 C004 的授权，也不包含其他未提交改动或分支合并。
 
+<a id="a007"></a>
+**A007 — 恢复主支项目设置，允许云单独降频。** 来源：同一云任务，2026-10-20 可见用户消息及随后批注。原话：“现在我需要你回滚这项设置，然后考虑可以将云朵帧率单独调慢。因为云朵速度太慢，所以帧率低一点也看不出来，这个你自己取舍”。随后明确：“不要画蛇添足，回滚到开发分支起始点的主支设置就行”。覆盖 C004 的恢复和 C007 的云模块内取舍，不授权其他全局设置变化。
+
+<a id="a008"></a>
+**A008 — 清理多轮修改的冗余。** 来源：同一云任务，2026-10-20 用户消息。要求检查多轮修改造成的冗余，并提出“如果有那种不影响性能的屎山，那就修改”。覆盖云初始化、参数组织和过时说明的清理，不扩展为玩法或基础框架重做。
+
+<a id="a009"></a>
+**A009 — 当前版本提交／推送。** 来源：同一云任务，2026-10-20 最新用户消息，原话：“将这一版推送吧”。按上一轮交付的范围，将项目设置恢复、云层独立更新及代码清理提交到现有开发分支，并按本地约定集中更新本报告；不包含 Piece.cs、空资源删除、AGENTS.md 正文或主分支合并。
+
 <a id="validation"></a>
 ## 验证与证据索引
 
-| 编号 | 类型与可访问范围 | 本次实际核对内容 | 结论边界 |
+| 编号 | 类型与可访问范围 | 实际核对内容 | 结论边界 |
 | --- | --- | --- | --- |
-| `V001` | `CURRENT_STATIC`；仓库内可复核 | 固定提交差异、4 次提交、20 个文件及 856/76 行统计；逐项阅读云、共用文件、资源及配置。 | 确认变更范围与接线，不等于运行通过。 |
-| `V002` | `CURRENT_STATIC` + `LOCAL_ARTIFACT` | 当前提交中的 6 份核心源码，与历史 `preview-project/shaders/` 中对应文件逐字节一致，详见下表；历史预览项目配置匹配原边界记录，与当前配置仅键顺序不同，按节／键比较的值一致。 | 确认列出的源码及项目配置值一致；不证明整份项目、工具链或设备环境一致。 |
-| `V003` | `CURRENT_GIT_CHECK`；工作区可复核 | `git check-ignore -v -- AGENTS.md` 命中根目录规则；Git 跟踪列表不含该规则文件；`ab989dd` 仅改 `.gitignore`。 | 确认忽略和提交范围；没有测试游戏行为。 |
-| `H001` | `HISTORICAL_RUNTIME_RECORD`；`LOCAL_ARTIFACT` | 历史截断修复记录：7 个平移位置、近／远景、4:3 与超宽比例；记录中云影像素一致。 | 原始材料未随本报告共享；不是本轮重新运行。 |
-| `H002` | `HISTORICAL_RUNTIME_RECORD`；`LOCAL_ARTIFACT` | 历史缓存性能对比：1080p、RTX 3060 Laptop、GL Compatibility；记录包括动态演化和缓存边界检查。 | 属于高度调整前的性能阶段，不把其数值作为当前最终版本耗时。 |
-| `H003` | `HISTORICAL_RUNTIME_RECORD`；`LOCAL_ARTIFACT` | 最后高度版本记录：最近视角与隐藏云图像一致；缩放不改变物理云影；内部演化与层间遮光；4 次运行退出码为 0。 | 本轮未重新执行，也未验证合作者设备或其他分支组合。 |
+| V001 | CURRENT_STATIC；仓库可复核 | 固定基准至代码核对点的 23 个非报告文件、1063/167 行、8 次提交；完整路径另包含报告自身。 | 确认范围、接线和统计，不等于完整运行验收。 |
+| V002 | HISTORICAL_STATIC + LOCAL_ARTIFACT | 初版报告核对过的六份旧核心源码及当时项目配置，旧哈希保留如下。 | 属于 7d3d951 版本，不再声称与当前已改源码逐字节相同。 |
+| V003 | CURRENT_GIT_CHECK | AGENTS.md 命中根忽略规则，未被跟踪；ab989dd 仅改 .gitignore。 | 忽略和提交范围，不包含游戏行为验证。 |
+| V004 | CURRENT_STATIC + LOCAL_ARTIFACT | 待提交源码与 H004/H005 的对应记录核对；project.godot 与起点逐字节相同。最终 cloud_optics 仅移除记录版本末尾一个多余空行，去除末尾空白后文本相同。H005 所查积分和合成函数内容、参数名／类型／默认值保持一致。 | 复用实施阶段证据；本次 Git 请求没有重新启动 Godot、构建或跑 GPU 测试。 |
+| H001 | HISTORICAL_RUNTIME_RECORD；LOCAL_ARTIFACT | 截断修复：7 个平移位置、近远景、4:3 与超宽比例。 | 原始材料仅本机可访问。 |
+| H002 | HISTORICAL_RUNTIME_RECORD；LOCAL_ARTIFACT | 高度调整前的云量缓存性能、动态演化及缓存边界检查。 | 不作为当前最终版本耗时。 |
+| H003 | HISTORICAL_RUNTIME_RECORD；LOCAL_ARTIFACT | 高度版本：最近景淡出、缩放不改物理云影、内部演化和层间遮光，4 次运行退出码 0。 | 当时项目默认 60 FPS；不是本次恢复设置后的结果。 |
+| H004 | IMPLEMENTATION_RUNTIME_RECORD；LOCAL_ARTIFACT | 独立更新阶段 12 项检查通过，静止／平移云时钟约 20.3 Hz、场景约 165.4／164.5 FPS；缓存外、云内高物体和 resize 检查通过。 | 清理前版本，后续差异由 H005 复核；原始材料未随仓库共享。 |
+| H005 | IMPLEMENTATION_RUNTIME_RECORD；LOCAL_ARTIFACT | 清理后 12 项检查通过；size 8/20/30/40 清理前后逐像素一致；静止／平移场景约 165.5／164.4 FPS，云约 20.3 Hz，云体纹理继续变化。1280×720 缓存与直接积分全图平均 RGB 差约 0.034/255。 | Godot 4.6.1 Mono、GL Compatibility、1920×1080、RTX 3060 Laptop；Engine.max_fps=0、原有 VSync 开启。隔离副本，复用已有 C# 程序集，含本地 Piece 修复，未证明纯提交版完整运行。 |
 
-V002 源码 SHA-256：
+V002 历史源码 SHA-256（旧核对点 7d3d951；并非当前 reviewed_commit）：
 
-| 仓库路径 | `reviewed_commit` 内容 SHA-256 |
+| 仓库路径 | `7d3d951` 内容 SHA-256 |
 | --- | --- |
 | `shaders/cloud_field.gdshaderinc` | `ed05bdb6de4aff3b1f9536bf08d3991807edf4da9ce459f74ad24f11720aa9fc` |
 | `shaders/cloud_layer.gdshader` | `6fd5f9f907151e32e2e197d7b5a605687995b3ed11af31a33abde54352012488` |
@@ -338,54 +413,71 @@ V002 源码 SHA-256：
 | `shaders/cloud_weather.gdshader` | `51a3ec1fb3d7ddd102961c50fc6a19d77d1567c55074af856f51a989d035681b` |
 | `shaders/low_poly.gdshader` | `640a7a9338e6dd0a6a0d0f477f53c05c2deed3dfda7dc02641b81673b448e399` |
 
-本地历史材料以云任务为归属，保存名称如下；这里只记录逻辑位置及摘要哈希，不写本机绝对路径，不提供不可移植的文件链接：
+
+当前代码核对点源码 SHA-256：
+
+| 路径 | `08515f0` 内容 SHA-256 |
+| --- | --- |
+| `project.godot` | `c28ee3ef9eaff9a96ff42d8943f5e705c00f99b25d2cfd05f71077bb5b9bed55` |
+| `shaders/CloudWeather.gd` | `432510b8bbb4cf934f692f521c7a74a874d79ab7c724329a77927f909ac2b468` |
+| `shaders/cloud_field.gdshaderinc` | `72788ed25caafa41819a9a52031fdef91a653982c5c1c20fad39d673fadd35e7` |
+| `shaders/cloud_layer.gdshader` | `0b0812a548354f3c13442877ef4b12782ef416287046e7be80a802ce9dbe0ebd` |
+| `shaders/cloud_optics.gdshaderinc` | `f6f495664eb946808801ea10e8caa50486a7ad85fae9a5b69788d318253f488e` |
+| `shaders/cloud_view.gdshader` | `aabc90e12375cdd0c73487b043deb1daf9a17ed94515988066d608fe6858d266` |
+| `shaders/cloud_weather.gdshader` | `51a3ec1fb3d7ddd102961c50fc6a19d77d1567c55074af856f51a989d035681b` |
+| `shaders/cloud_sunlight.gdshader` | `2dc50839a36689d2edb27eafe077254d6675a6ed9a58d464bb139c4c967ae492` |
+| `shaders/low_poly.gdshader` | `640a7a9338e6dd0a6a0d0f477f53c05c2deed3dfda7dc02641b81673b448e399` |
+
+本机证据逻辑位置及摘要哈希如下。原始日志、截图和测试脚本仅属于 LOCAL_ARTIFACT，没有写入仓库，也没有依赖合作者无法访问的绝对路径：
 
 | 编号 | 材料名 | SHA-256 |
 | --- | --- | --- |
 | H001 | `clouds/round-5-ray-clipping/validation-summary.json` | `0a7db4d6f4c6e708dea4594d4bd76280308f1dfeedae40fe227289c74818b96f` |
 | H002 | `clouds/round-6-performance/validation-summary.json` | `b69b52c7b9e0c27c6e0989bc6e5267d2a9602bb4dcdf5001bd340fb895fc1044` |
 | H003 | `clouds/round-7-altitudes/validation-summary.json` | `99f927434b09f183b2494406ea18c17d6d94eaeda0d7de9ae53956aaac0dc061` |
+| H004 | `clouds/round-8-cloud-cadence/validation-summary.json` | `8dd677aba904479ae42a655613e6cd9b6ceae57ef70c1f97474d69a2f86adaf6` |
+| H005 | `clouds/round-9-cleanup/validation-summary.json` | `0103fb0e9558891801338f77833e3650a6491b6ee0784874e996e6c9f8f707ed` |
 
-H003 的历史记录给出近景 size 20／远景 size 40 GPU 总耗时约 `8.9 / 11.6 ms`，包含缓存；条件为 Godot 4.6.1 Mono、GL Compatibility、1920×1080、RTX 3060 Laptop、60 FPS 默认上限。此为本机历史记录，不能用于承诺其他环境的耗时。
+H003 的近／远景 GPU 总耗时约 8.9/11.6 ms，属于旧 60 FPS 上限条件。H004/H005 是恢复主支设置后的运行记录，不能把两类条件下的数字直接等同。间歇视口的 GPU 查询可能保留旧值，早期 benchmark.json 的更新计数与派生总耗时不采信；更新频率另由云时钟变化、实际绘制次数和图像变化确认。
 
-完整项目一致性限制：历史高度阶段的 `source-boundary.json` 中，`Piece.cs` 的哈希匹配当前本地未提交修复，而不匹配已提交版本。`project.godot` 的字节差异已核对为属性序列化顺序变化，配置值一致。V002 只确认上述源码及配置范围，不能将包含本地单位修复的历史运行扩大为整份纯提交版已经运行验证。本轮没有启动 Godot、构建项目或执行新的 GPU 测试。
+完整项目一致性限制：历史预览使用的 Piece.cs 清理仍是本地排除项，程序集包含它。当前只将与实际源码和条件一致的云模块检查列为实施阶段结果，不将其扩写成纯提交版、所有玩法、其他设备或合作者分支已回归通过。
 
 <a id="collaboration"></a>
 ## 合作接入检查与范围限制
 
 | 检查项 | 已确认事实 | 后续接入要求 |
 | --- | --- | --- |
-| 玩法与数据 | 固定差异中没有 `.cs`、`.csproj`、`.sln`、`Map/` 或 `world/UI/`、`template/` 内的变更。 | 不据此推断所有玩法已回归；合并后检查选中、移动、攻击提示和相机操作。 |
-| 渲染和依赖 | `project.godot` 仅新增 FPS 键；渲染模式仍为 `gl_compatibility`，SDK／依赖文件未改。 | 对方若调整相机投影、渲染模式、地形或模型高度，复核 C001 的深度和高度假设。 |
-| 共用材质 | 接收云影路径发生变化，其他地表公式未重写。 | 对方修改材质或光照时，核对 C003 和共享 uniform，不能只看是否有文本冲突。 |
-| 缓存范围 | 固定世界范围，范围外直接计算。 | 保持 A002 暂缓边界；需要相机跟随缓存时另提方案。 |
-| 动态参数 | 模板、接收材质、两份缓存存在初始化复制关系。 | 引入天气／风向／太阳动态控制时同步所有消费者参数，见 C002。 |
-| 目标分支 | 本次远端目标仍等于起点。 | 未来主分支更新后记录新目标，区分同步来源，重新核对交集与运行结果。 |
+| 玩法与数据 | 已提交净差异没有 .cs、.csproj、.sln、Map/、world/UI/ 或 template/ 内的变化。 | 合并后仍按目标版本检查选中、移动、攻击提示和相机操作。 |
+| 项目与依赖 | project.godot 与固定起点逐字节一致；渲染模式、SDK 与依赖未改。 | 若对方更换投影、渲染方式或模型高度，重新核对云显示假设。 |
+| 共用材质 | 云影路径和云时钟绑定变化，其他地表公式保持原样。 | 核对共享 uniform、噪声和初始化时序，不能仅按文本无冲突判断。 |
+| 世界缓存范围 | 仍固定，范围外直接计算；没有改成相机跟随。 | 保持 A002 的暂缓边界；C007 的屏幕视线缓存另行随相机更新。 |
+| 动态参数 | 模板、接收材质和三份缓存存在初始化复制关系。 | 增加动态天气／太阳控制时同步全部消费者。 |
+| 目标主支 | 推送前 fetch 后仍等于固定起点。 | 未来主支更新时保留固定起点，记录同步来源并重核兼容。 |
+| 帧率条件 | 云主要计算约 20 Hz；缩放／旋转等会强制刷新云体。 | 实际显示帧率受原有 VSync、硬件及场景影响，不视作全局帧率保证。 |
 
 <a id="local-only"></a>
 ## 本地排除项与报告自身
 
-以下不是上述 20 个已提交变更文件。既有两处改动在生成本报告前已存在；本次未将它们归入云开发结果。
-
-| 项目 | 核对状态／归属 | 归属与处理 |
+| 项目 | 核对状态／归属 | 处理 |
 | --- | --- | --- |
-| `template/Piece/Piece.cs` | `M`；未暂存 | 本地存在单位销毁时释放未挂树技能节点的改动；不在云分支已提交差异中，不随报告纳入提交。 |
-| `template/tile/GrassWindNoise.tres` | `D`；未暂存 | 本地删除；已提交对象为零字节。排除在云提交和本报告的提交候选之外。 |
-| `AGENTS.md` | `IGNORED`；本地维护规则 | 本地个人约定，不跟踪、不随报告共享；其正文不是已提交的仓库规范。 |
-| `docs/branch-reports/codex-realistic-clouds.md` | `REPORT_ONLY`；`USER_REVIEWED` | 报告本身按 A006 单独提交，不计入 `reviewed_commit` 覆盖的 20 个变更文件。 |
+| template/Piece/Piece.cs | 本地既有修改，未暂存 | 单位销毁时释放未挂树技能节点，不归入云提交。 |
+| template/tile/GrassWindNoise.tres | 本地既有删除，未暂存 | 已提交对象为零字节；本轮保留删除现场，不混入云提交。 |
+| AGENTS.md | IGNORED | 正文未跟踪，继续只保留本地。 |
+| docs/branch-reports/codex-realistic-clouds.md | REPORT_ONLY；UPDATED_NOT_USER_REVIEWED | 本次按 A009 与既有维护约定更新后单独提交；保留代码核对点 08515f0。 |
 
-既有已跟踪工作区差异的核对指纹：`git diff --binary HEAD` 的 SHA-256 为 `471cb73f0d640b4fdb98b69085453faedb385690c6d54a89eedb5ceab8965a6e`。该指纹用于本次保留现场检查，不是未来工作区必须长期保持的值。
+两项既有已跟踪工作区差异的 `git diff --binary` SHA-256 仍为 `471cb73f0d640b4fdb98b69085453faedb385690c6d54a89eedb5ceab8965a6e`，与初版报告时一致。本次提交／推送不包含这些差异。
 
 <a id="decisions"></a>
 ## 待决定事项与报告更新
 
 | 事项 | 当前状态 | 下一步 |
 | --- | --- | --- |
-| 第一版报告的内容和结构 | `USER_REVIEWED` | A006 已确认报告，并授权按 `REPORT_ONLY` 单独提交／推送；AGENTS.md 保持本地。 |
-| C004 的全局帧率策略 | `EXTRA_APPROVAL_UNCONFIRMED` | 在准备合入共同版本时明确保留或另行调整；本轮只记录，不修改设置。 |
-| 与合作者最新模块的兼容 | `NOT_ASSESSED` | 获得对应版本并准备接入时，按共用文件与参数依赖核对。 |
-| 纯已提交版本的运行回归 | `NOT_RUN_THIS_REVIEW` | 需要运行验收时使用明确提交及隔离验证环境，不混入本地排除项。 |
+| 初版报告审阅 | USER_REVIEWED，A006 | 保留历史审阅事实；本次扩展未被追认成已单独审阅。 |
+| 当前版本提交／推送 | EXPLICITLY_APPROVED，A009 | 提交现有云版本并更新报告，不包含排除项或主分支合并。 |
+| C004 全局帧率策略 | WITHDRAWN，A007 | 当前文件恢复起点，已退出候选，无需再决定保留旧 60 FPS 键。 |
+| 合作者最新模块的兼容 | NOT_ASSESSED | 准备接入对应版本时核对共用文件及参数依赖。 |
+| 纯提交版完整运行回归 | NOT_RUN_THIS_REVIEW | 云实施阶段已有本机隔离证据，完整纯提交版验收仍需另行明确版本与环境。 |
 
-维护时机：仅在用户明确要求 commit／push（提交或推送）时，在执行前集中更新报告；日常开发、调试、验证和任务交付不要求同步维护。用户另外明确要求查看、生成或修订报告时，按该指令处理。
+维护时机：仅在用户明确要求 commit／push 时，在执行前集中汇总实际内容并更新本报告；日常开发、调试、验证和交付不要求同步维护。用户另行要求查看、生成或修订时按其指令处理。
 
-更新要求：维护时保持 C001～C006 编号与报告路径稳定；新增行为建立新编号，修订现有行为更新原条目。撤回项保留编号并退出候选清单。届时集中汇总实际准备提交／推送的内容，重新核对完整文件索引和固定基准统计；同步主分支时标明来源。`reviewed_commit` 只承诺已核对的内容；后续若仅提交本报告，可保留该值，其他文件有变化则在下一次报告维护时补充核对。清理已过期的草稿、待审和工作区状态，不把旧验证或旧授权无条件沿用。
+维护时保持 C001～C008 编号及报告路径稳定，新增行为使用新编号，撤回项保留历史并退出候选。reviewed_commit 只承诺已核对代码；后续仅改本报告的 REPORT_ONLY 提交可保留此值，出现其他路径变化时在下一次维护中补充核对。不得把旧运行、旧授权或旧主分支观察值无条件沿用。
