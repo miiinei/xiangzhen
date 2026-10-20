@@ -22,3 +22,6 @@ obj/
 .DS_Store
 Thumbs.db
 build_log.txt
+
+# Local AI working agreement
+/AGENTS.md
