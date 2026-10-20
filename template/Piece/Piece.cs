@@ -51,6 +51,20 @@ public partial class Piece : Thing
         _pathPreview = GetNodeOrNull<MeshInstance3D>(PathPreviewNodePath);
     }
 
+    public override void _Notification(int what)
+    {
+        if (what != NotificationPredelete) return;
+
+        // Skills outside the scene tree still belong to this piece.
+        foreach (var skill in GetSkills())
+        {
+            if (GodotObject.IsInstanceValid(skill) && skill.GetParent() == null)
+            {
+                skill.Free();
+            }
+        }
+    }
+
     public void EnsureSkills()
     {
         if (Skill1 == null && Skill1Scene != null) Skill1 = Skill1Scene.Instantiate<Skill>();
