@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://template/Piece/Piece.tscn" id="1_piece"]
+[ext_resource type="PackedScene" path="res://template/Piece/铁岳/铁岳.glb" id="2_mech"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_marker"]
+top_radius = 0.36
+bottom_radius = 0.36
+height = 0.02
+radial_segments = 6
+
+[node name="MechPiece" instance=ExtResource("1_piece")]
+
+[node name="BodyMesh" parent="." index="0"]
+position = Vector3(0, -0.26, 0)
+mesh = SubResource("CylinderMesh_marker")
+
+[node name="VisualRoot" type="Node3D" parent="." index="2"]
+position = Vector3(0, -0.25, 0)
+
+[node name="ColossalKnight" parent="VisualRoot" instance=ExtResource("2_mech")]
+scale = Vector3(0.002, 0.002, 0.002)

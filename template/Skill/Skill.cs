@@ -309,6 +309,8 @@ public partial class Skill : Control
             return;
         }
 
+        if (_originTile == null) Caster?.FaceTowards(target.GlobalPosition);
+
         if (!Straight)
         {
             ResolveTargetArea(target);

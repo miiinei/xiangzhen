@@ -7,11 +7,11 @@ public partial class Piece : Thing
     private const int DefaultMoveRange = 3;
     private const float DefaultPathPreviewWidth = 0.08f;
     private const string PathPreviewWidthRangeHint = "0.01,0.5,0.01";
-    private const float MovementStepDuration = 0.15f;
     private const int MinimumPathPointCount = 2;
     private const float MinimumMiterDenominator = 0.25f;
     private const float MaximumMiterWidthMultiplier = 1.5f;
     private static readonly NodePath BodyMeshNodePath = "BodyMesh";
+    private static readonly NodePath VisualRootNodePath = "VisualRoot";
     private static readonly NodePath PathPreviewNodePath = "PathPreview";
     private static readonly Color SelectedPieceColor = new(1f, 0.8f, 0.22f);
     private static readonly Color DefaultPieceColor = new(0.85f, 0.45f, 0.18f);
@@ -36,6 +36,7 @@ public partial class Piece : Thing
     private PieceState _state;
     private SkillPanel _skillPanel;
     private MeshInstance3D _mesh;
+    private Node3D _visualRoot;
     private MeshInstance3D _pathPreview;
     private Tile _hoveredTargetTile;
     private bool _isMoving;
@@ -47,6 +48,7 @@ public partial class Piece : Thing
         RemainingMoveRange = MoveRange;
         EnsureSkills();
         _mesh = GetNodeOrNull<MeshInstance3D>(BodyMeshNodePath);
+        _visualRoot = GetNodeOrNull<Node3D>(VisualRootNodePath);
         if (_mesh != null) _mesh.MaterialOverride = CreateMaterial(false);
         _pathPreview = GetNodeOrNull<MeshInstance3D>(PathPreviewNodePath);
     }
@@ -154,6 +156,18 @@ public partial class Piece : Thing
     public override bool IsBusy => _state != PieceState.Default;
 
     public override void SetSelected(bool selected) { if (_mesh != null) _mesh.MaterialOverride = CreateMaterial(selected); OccupiedTile?.SetSelected(selected); }
+
+    public void FaceTowards(Vector3 globalTarget)
+    {
+        if (_visualRoot == null) return;
+        Vector3 direction = globalTarget - GlobalPosition;
+        direction.Y = 0f;
+        if (Mathf.IsZeroApprox(direction.LengthSquared())) return;
+
+        // The imported glTF model faces +Z; rotate only its visual, not the tile/UI.
+        _visualRoot.LookAt(_visualRoot.GlobalPosition + direction, Vector3.Up, true);
+    }
+
     public override void ResetTurn()
     {
         RemainingMoveRange = MoveRange;
@@ -208,10 +222,11 @@ public partial class Piece : Thing
 
         _isMoving = true;
         ClearPathPreview();
-        return MoveAlongPathCoreAsync(path);
+        MoveAlongPathCore(path);
+        return Task.CompletedTask;
     }
 
-    private async Task MoveAlongPathCoreAsync(List<Tile> path)
+    private void MoveAlongPathCore(List<Tile> path)
     {
         var startingTile = OccupiedTile;
         startingTile.SetSelected(false);
@@ -220,14 +235,8 @@ public partial class Piece : Thing
         {
             foreach (var tile in path.GetRange(1, path.Count - 1))
             {
-                var tween = CreateTween();
-                tween.TweenMethod(
-                    Callable.From<Vector3>(SetMovementPosition),
-                    Position,
-                    tile.Position + Vector3.Up * WorldGeometry.PieceElevation,
-                    MovementStepDuration
-                );
-                await ToSignal(tween, Tween.SignalName.Finished);
+                FaceTowards(tile.GlobalPosition);
+                SetMovementPosition(tile.Position + Vector3.Up * WorldGeometry.PieceElevation);
             }
             SetOccupiedTile(path[^1]);
             if (_state != PieceState.Default)

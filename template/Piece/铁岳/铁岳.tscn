@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://template/Piece/铁岳/MechPiece.tscn" id="1_piece"]
+[ext_resource type="Script" path="res://template/Piece/铁岳/铁岳.cs" id="2_tie_yue"]
+[ext_resource type="PackedScene" path="res://template/Skill/高射炮/高射炮.tscn" id="3_high"]
+[ext_resource type="PackedScene" path="res://template/Skill/丢射炮/丢射炮.tscn" id="4_lob"]
+[ext_resource type="PackedScene" path="res://template/Skill/动能炮/动能炮.tscn" id="5_kinetic"]
+[ext_resource type="PackedScene" path="res://template/Skill/拐弯炮/拐弯炮.tscn" id="6_turn"]
+
+[node name="铁岳" instance=ExtResource("1_piece")]
+script = ExtResource("2_tie_yue")
+Skill1Scene = ExtResource("3_high")
+Skill2Scene = ExtResource("4_lob")
+Skill3Scene = ExtResource("5_kinetic")
+Skill4Scene = ExtResource("6_turn")
+MoveRange = 3
+MaxHP = 5
+HP = 5

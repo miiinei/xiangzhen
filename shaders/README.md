@@ -104,25 +104,28 @@
 
 ## 湿季草原
 
-`grassland.gdshader` / `grassland.tres` 只用于 Grass 地块和美术预览地面。地表以世界 xz 坐标采样，邻格共用连续的颜色与风动分布，不改变六边形网格高度、地形类型、碰撞和移动规则。雨季草原的配色与笔触来自生图制作的 [grassland_canopy.png](textures/grassland_canopy.png)，采用成片草色和冷暖变化；生成来源、完整提示词及使用限制见 [素材说明](textures/grassland_canopy.md)。`Tile.GrassColor` 作为乘法调色，默认轻微偏冷，收住素材中的黄绿色。旧版遍布地面的枯草、湿土、碎斑纹理与细节法线已删除。
+上一版实机风格已获用户认可。当前使用结合固定正交镜头生成的 `battlefield_meadow_view_v2.png`；用户认可图片本身，指出实机铺图比例偏大，因此本次把景物线性尺度缩到之前的四分之一，原 PNG 不变。已保存参考图、去云中间图、制作方法和完整提示词；后续按关卡布局生成河流、坡谷及对应交互的方向，见 [关卡地形制作约定](textures/battlefield_meadow.md#level-layout)。该流程尚未实现，当前仍是草原美术试作。
 
-草地使用两张共享纹理。草冠图源文件为 1254×1254，导入时限制到 1024 并生成 mipmap。材质分两次读取同一张图：64 km 跨度的第 4 级 mip 只提供平缓色块，较小尺度的镜像采样提供很弱的笔触明暗，避免将微细笔触放大为大片斑点。`grass_land_noise.tres` 为 256×256 的单倍频 Perlin 分布，启用无缝平铺和 mipmap，仅用于阵风形状。每片元合计三次草地纹理采样，云影沿用已有查询。不新增草叶实例、运行时逐草物理、渲染视口或体积积分循环。
+主战场 Grass 地块和 `StylePreview.tscn` 使用 `grassland.gdshader` / `grassland.tres`。地表来自用户认可的平缓草原概念图：保留植被疏密、细碎草冠、少量水洼和石质斑块，细节适当概括，局部笔触不抢景物。参考图、当前素材、完整生成提示词与映射限制见 [战场地表素材说明](textures/battlefield_meadow.md)。
 
-草风与云共用 `grass_wind_direction`，地面阵风速度独立标定；草层受光仍按原生 `TIME` 连续更新，不跟随云的 20 次/秒时钟。阵风使用柔和的前缘和较长的恢复段，沿途有强弱和消散，连续改变等效草冠朝向、叶片受光与宽高光，让默认战术视距能够辨认传播过程。地表固有色不随风平移。光照采用连续漫反射与简化的宽高光，高粗糙度控制高光宽度；它不是逐叶片或完整的物理植被模型。云影同时衰减直接漫反射和高光，环境补光保留。
+`battlefield_meadow_view_v2.png` 是 1536×1024 的完整地表绘制，使用原生分辨率、自动 mipmap 和世界坐标连续采样，不强制压成大色块，也不重复叠加放大的笔触。它保留局部绘画明暗；大块云影及边缘云朵在生成资产时移除，由原有实时天气系统补充。固定相机朝向下，材质将俯瞰绘制映射回世界 xz 平面，相邻格子连续，相机平移、缩放时素材不滑动。当前以同向局部取样和边界过渡延展草地，各处保持相同景物尺度；视角提示词不代表生成图具备可验证的精确三维投影。
+
+主战场的六边格仍然平坦，边长为 1 km。地形类型、单位位置、碰撞、描边和地图数据继续使用原有行为。`Tile.GrassColor` 调整为白色，避免额外乘色破坏素材配色；Water、Mountain 及单位仍使用原有独立材质。主场景增加仅供显示的 `BattlefieldGround` 平面，延续棋盘外的草原，不参与碰撞、点击或地图保存。独立 `StylePreview` 平移到同一素材中心，供 F6 查看。
+
+草风与云共用 `grass_wind_direction`，原生 `TIME` 驱动非周期阵风连续传播，不跟随云缓存的 20 Hz 时钟。动态部分混合直立、弯折草冠的受光，不整体倾斜地形法线，不平移地表图。植被色彩和局部噪声调节响应，水洼、石质区域响应减弱。高光保持克制。地表以四个重叠局部取样延展，不旋转或镜像，外围也不再放大景物。每片元六次草地纹理读取：四次地表、两次风噪声；沿用原有云影查询，没有新增草叶、运行时烘焙或视口。
 
 | 参数 | 默认值 | 用途 |
 | --- | --- | --- |
-| `base_color` | (0.86, 0.96, 1) | 草冠图的乘法调色，运行时由 `Tile.GrassColor` 覆盖 |
-| `grass_texture_span` | 64 | 草冠图的世界跨度，单位 km；当前棋盘与预览地面均未跨越纹理重复边缘 |
-| `grass_wind_speed` | 0.085 | 阵风传播的视觉速度，单位 km/s，按战术镜头标定，不代表实测风速 |
-| `grass_wind_strength` | 0.75 | 草冠朝向与受光的响应强度，0 可静止比较 |
-| `grass_wind_spacing` / `grass_wind_width` | 4.8 / 0.85 | 阵风间距与基础恢复段长度，单位 km |
-| `grass_sheen_strength` | 0.075 | 草冠宽高光强度 |
-| `direct_strength` / `ambient_strength` | 1 / 0.35 | 连续直接光和环境补光强度，仅属于草地材质 |
+| `base_color` | 白色 | 草地乘色，运行时由 `Tile.GrassColor` 覆盖 |
+| `grass_texture_origin` | (16.75, 14.25) | 地表图的世界 xz 中心，单位 km |
+| `grass_texture_span` | (12, 8) | 源图全宽高对应的投影尺度，单位 km；此前为 (48, 32)，当前景物线性缩小四倍 |
+| `grass_wind_speed` | 0.085 | 阵风传播的视觉速度，单位 km/s，不代表实测风速 |
+| `grass_wind_strength` | 0.75 | 草冠受光响应强度，0 可静止比较 |
+| `grass_sheen_strength` | 0.025 | 草冠宽高光强度 |
+| `direct_strength` / `ambient_strength` | 1 / 0.22 | 草地直接光与环境补光强度 |
+| `cloud_shadow_strength` | 0.44 | 草地实时云影强度 |
 
-正交相机缩放时保留色差与阵风的世界尺度，较远视角继续保留宽阔阵风和云影。由于已去掉细碎纹理与法线，不再需要旧版的近远细节分支。采样使用 mipmap 过滤。
-
-实现参考方向：[GPU Gems 2 的风动与远处植被明暗](https://developer.nvidia.com/gpugems/gpugems2/part-i-geometric-complexity/chapter-1-toward-photorealism-virtual-botany)、[Terrain3D 的大尺度颜色与材质分层](https://terrain3d.readthedocs.io/en/stable/docs/shader_design.html)、[HTerrain 的远景整体颜色图](https://hterrain-plugin.readthedocs.io/en/latest/#global-map)。本模块是针对现有平坦棋盘的独立实现，未引入这些地形插件。
+地表源图不是无缝贴图。材质用重叠的局部取样和显式 mip 梯度处理衔接，尺度与覆盖范围分开；(12, 8) 不表示整片战场只显示在 12×8 km 内。该方法只延展装饰草地，不能保持图内景物与关卡设计区域的一一对应。此前的 [grassland_canopy.png](textures/grassland_canopy.md) 保留给独立 `grassland_study` 试验样区使用，主战场已使用新素材。
 
 ## 调参与成本
 

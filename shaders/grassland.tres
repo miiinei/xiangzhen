@@ -5,7 +5,7 @@
 [ext_resource type="Texture3D" path="res://shaders/cloud_volume_noise.tres" id="3_volume"]
 [ext_resource type="Texture3D" path="res://shaders/cloud_base_noise.tres" id="4_base"]
 [ext_resource type="Texture2D" path="res://shaders/grass_land_noise.tres" id="5_land"]
-[ext_resource type="Texture2D" path="res://shaders/textures/grassland_canopy.png" id="6_color"]
+[ext_resource type="Texture2D" path="res://shaders/textures/battlefield_meadow_view_v2.png" id="6_color"]
 
 [resource]
 shader = ExtResource("1_shader")

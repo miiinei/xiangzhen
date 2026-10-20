@@ -1,13 +1,17 @@
 [gd_scene format=3 uid="uid://cd8oa7bepa0xp"]
 
 [ext_resource type="Script" uid="uid://chp28bqsk127x" path="res://world/World.cs" id="1_world"]
-[ext_resource type="PackedScene" uid="uid://bl8acul42v3h2" path="res://template/Piece/龙骑士/龙骑士.tscn" id="2_fj7yv"]
+[ext_resource type="PackedScene" path="res://template/Piece/铁岳/铁岳.tscn" id="2_fj7yv"]
 [ext_resource type="PackedScene" uid="uid://b6s4vel6q4oi3" path="res://template/tile/Tile.tscn" id="3_tile"]
 [ext_resource type="PackedScene" uid="uid://enemybase01" path="res://template/Enemy/Enemy.tscn" id="4_enemy"]
 [ext_resource type="PackedScene" path="res://world/UI/BuildPanel.tscn" id="5_build_panel"]
 [ext_resource type="Material" path="res://shaders/cloud_layer.tres" id="6_cloud"]
 
 [ext_resource type="Script" path="res://shaders/CloudWeather.gd" id="7_weather"]
+[ext_resource type="Material" path="res://shaders/grassland.tres" id="8_grass"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_battlefield"]
+size = Vector2(144, 144)
 
 [sub_resource type="QuadMesh" id="QuadMesh_cloud"]
 size = Vector2(2, 2)
@@ -27,6 +31,12 @@ CameraMoveSpeed = 20.0
 PieceScene = ExtResource("2_fj7yv")
 EnemyScene = ExtResource("4_enemy")
 TileScene = ExtResource("3_tile")
+
+[node name="BattlefieldGround" type="MeshInstance3D" parent="."]
+position = Vector3(16.75, 0.079, 14.25)
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_battlefield")
+material_override = ExtResource("8_grass")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=76617219]
 projection = 1

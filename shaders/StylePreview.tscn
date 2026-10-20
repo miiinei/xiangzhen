@@ -33,6 +33,7 @@ background_mode = 1
 background_color = Color(0.52, 0.73, 0.85, 1)
 
 [node name="StylePreview" type="Node3D"]
+position = Vector3(16.75, 0, 14.25)
 
 [node name="Ground" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_ground")

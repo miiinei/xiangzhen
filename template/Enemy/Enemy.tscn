@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://enemybase01"]
 
-[ext_resource type="PackedScene" uid="uid://b3d3u50uo1d5k" path="res://template/Piece/Piece.tscn" id="1_piece"]
+[ext_resource type="PackedScene" path="res://template/Piece/铁岳/MechPiece.tscn" id="1_piece"]
 [ext_resource type="Script" uid="uid://cc5ykndxn7ml0" path="res://template/Enemy/Enemy.cs" id="2_enemy_script"]
 [ext_resource type="PackedScene" uid="uid://igcpxr5a5vnn" path="res://template/Skill/拐弯炮/拐弯炮.tscn" id="3_2vpl3"]
 

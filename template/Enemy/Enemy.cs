@@ -289,6 +289,7 @@ public partial class Enemy : Piece
 		_preparedSkill = action?.Skill;
 		_preparedTarget = action?.Target;
 		if (_preparedSkill == null || _preparedTarget == null) return;
+		FaceTowards(_preparedTarget.GlobalPosition);
 
 		_preparedTargetOffset = GetRelativeTargetOffset(OccupiedTile, _preparedTarget);
 		_lastPreparedSkill = _preparedSkill;
