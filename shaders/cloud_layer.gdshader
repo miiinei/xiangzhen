@@ -1,106 +1,34 @@
 shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_never, depth_test_disabled, cull_disabled, fog_disabled;
 
-#include "res://shaders/cloud_field.gdshaderinc"
+#include "res://shaders/cloud_optics.gdshaderinc"
 
-// Ray integration and sunlight extinction adapted for a local, downward-looking
-// cloud layer from the MIT references in CLOUDS_LICENSES.md.
 uniform sampler2D scene_depth : hint_depth_texture, repeat_disable, filter_nearest;
-uniform vec4 cloud_color : source_color = vec4(0.965, 0.975, 0.985, 1.0);
-uniform vec4 cloud_shade_color : source_color = vec4(0.28, 0.34, 0.42, 1.0);
+uniform sampler2D cloud_view_map : repeat_disable, filter_linear;
+uniform bool cloud_use_view_map = false;
+uniform vec3 cloud_view_center;
+uniform vec3 cloud_view_u;
+uniform vec3 cloud_view_v;
+
+// Display-only controls stay in the live compositor, outside the cached optics.
 uniform float cloud_opacity : hint_range(0.0, 1.0) = 0.38;
 uniform float unit_cloud_opacity : hint_range(0.0, 1.0) = 0.08;
 uniform float unit_far_cloud_opacity : hint_range(0.0, 1.0) = 1.0;
-uniform float cloud_extinction : hint_range(0.1, 4.0) = 1.2;
-uniform float cloud_light_extinction : hint_range(0.1, 6.0) = 1.6;
-uniform int cloud_light_steps : hint_range(2, 8, 1) = 4;
-uniform int cloud_steps : hint_range(8, 48, 4) = 24;
-uniform int cloud_upper_steps : hint_range(8, 32, 4) = 16;
 uniform float cloud_upper_opacity : hint_range(0.0, 1.0) = 1.0;
 uniform float cloud_far_opacity : hint_range(0.0, 1.0) = 1.0;
-uniform vec2 cloud_zoom_range = vec2(20.0, 40.0);
-uniform vec2 cloud_close_fade_range = vec2(8.0, 14.0);
-uniform float cloud_near_thickness_scale : hint_range(0.05, 1.0) = 0.34375;
-uniform float cloud_far_detail : hint_range(0.0, 1.0) = 0.65;
 
-// Cirrus is an artistic distant backdrop. It is absent over scene geometry and
-// never participates in the two physical bands' sunlight or ground shadows.
+// Cirrus is a distant backdrop, absent over geometry and without shadows.
 uniform vec2 cloud_cirrus_zoom_range = vec2(34.0, 40.0);
 uniform float cloud_cirrus_opacity : hint_range(0.0, 0.5) = 0.16;
 uniform vec4 cloud_cirrus_color : source_color = vec4(0.88, 0.94, 0.985, 1.0);
 uniform float cloud_cirrus_height = 9.0;
 
-vec3 cloud_reference_position(vec3 world_position, float band, float thickness_scale) {
-    float base_height = cloud_band_height(band);
-    world_position.y = base_height + (world_position.y - base_height) / thickness_scale;
-    return world_position;
-}
-
-float view_cloud_density(vec3 world_position, float band, float thickness_scale, float detail_contrast) {
-    return cloud_band_density(cloud_reference_position(world_position, band, thickness_scale),
-        band, detail_contrast) * thickness_scale;
-}
-
-// Each occupied band gets its own sample budget: no samples are spent in the
-// clear gap. The upper band is composited before the lower one, along the ray.
-vec4 march_cloud_band(vec3 ray_origin, vec3 ray_direction, float surface_distance,
-        float band, float thickness_scale, float detail_contrast, float ray_offset) {
-    if (band > 0.5 && cloud_upper_density <= 0.0) {
-        return vec4(0.0);
-    }
-    float base_height = cloud_band_height(band);
-    float view_thickness = cloud_band_thickness(band) * thickness_scale;
-    float base_distance = (base_height - ray_origin.y) / ray_direction.y;
-    float top_distance = (base_height + view_thickness - ray_origin.y) / ray_direction.y;
-    float entry = max(min(base_distance, top_distance), 0.0);
-    float exit_distance = min(max(base_distance, top_distance), surface_distance);
-    if (exit_distance <= entry) {
-        return vec4(0.0);
-    }
-
-    int steps = band > 0.5 ? cloud_upper_steps : cloud_steps;
-    int light_steps = band > 0.5 ? max(cloud_light_steps - 1, 2) : cloud_light_steps;
-    float step_length = (exit_distance - entry) / float(steps);
-    vec3 accumulated_color = vec3(0.0);
-    float transmission = 1.0;
-    for (int i = 0; i < steps; i++) {
-        vec3 sample_position = ray_origin + ray_direction
-            * (entry + (float(i) + ray_offset) * step_length);
-        float density = view_cloud_density(sample_position, band, thickness_scale, detail_contrast);
-        if (density < 0.001) {
-            continue;
-        }
-        // Visible compression changes neither the physical point's lighting
-        // nor the upper cloud's ability to shadow this lower cloud.
-        vec3 reference_position = cloud_reference_position(sample_position, band, thickness_scale);
-        float sunlight_depth = cloud_band_sun_depth(reference_position, band, light_steps);
-        if (band < 0.5) {
-            sunlight_depth += cloud_upper_sun_depth(reference_position)
-                * cloud_upper_shadow_strength;
-        }
-        float light_depth = sunlight_depth * cloud_light_extinction;
-        float direct_light = exp(-light_depth);
-        float scattered_fill = 0.12 * exp(-light_depth * 0.35);
-        float altitude = (sample_position.y - base_height) / view_thickness;
-        float illumination = clamp(0.14 + altitude * 0.12 + direct_light * 0.72
-            + scattered_fill, 0.0, 1.0);
-        vec3 sample_color = mix(cloud_shade_color.rgb, cloud_color.rgb, illumination);
-        float sample_alpha = 1.0 - exp(-density * step_length * cloud_extinction);
-        accumulated_color += transmission * sample_alpha * sample_color;
-        transmission *= 1.0 - sample_alpha;
-        if (transmission < 0.01) {
-            break;
-        }
-    }
-    return vec4(accumulated_color, 1.0 - transmission);
-}
-
 float distant_cirrus(vec2 world_position) {
     vec2 wind = cloud_rotated_wind(0.45);
     vec2 across_wind = vec2(-wind.y, wind.x);
-    vec2 coordinates = (world_position - TIME * wind * cloud_speed * 1.8)
+    vec2 coordinates = (world_position - cloud_time() * wind * cloud_speed * 1.8)
         * cloud_scale + cloud_weather_origin.xz + vec2(0.81, 0.27);
-    float evolution = TIME * cloud_evolution_speed;
+    float evolution = cloud_time() * cloud_evolution_speed;
     vec2 warp = vec2(texture(cloud_noise, coordinates * 0.6 + vec2(0.13, 0.51)).r,
         texture(cloud_noise, coordinates * 0.6 + vec2(0.79, 0.31)).r) - vec2(0.5);
     vec2 stretched = vec2(dot(coordinates, wind) * 0.22,
@@ -155,15 +83,33 @@ void fragment() {
     float ray_offset = mix(0.5,
         fract(sin(dot(FRAGCOORD.xy, vec2(12.9898, 78.233))) * 43758.5453), 0.35);
 
+    // Reproject the held cloud image along the current orthographic rays, so
+    // camera panning stays at the scene's frame rate between cloud updates.
+    vec3 from_cache_center = ray_origin - cloud_view_center;
+    vec2 cache_uv = vec2(0.5) + vec2(
+        dot(from_cache_center, cloud_view_u) / max(dot(cloud_view_u, cloud_view_u), 0.0001),
+        dot(from_cache_center, cloud_view_v) / max(dot(cloud_view_v, cloud_view_v), 0.0001));
+    bool cached = cloud_use_view_map && min(cache_uv.x, cache_uv.y) > 0.001
+        && max(cache_uv.x, cache_uv.y) < 0.999;
     vec4 upper = vec4(0.0);
     if (cloud_upper_opacity > 0.0) {
-        upper = march_cloud_band(ray_origin, ray_direction, surface_distance,
-            1.0, thickness_scale, detail_contrast, ray_offset) * cloud_upper_opacity;
+        if (cached && surface_world.y < cloud_upper_height) {
+            upper = texture(cloud_view_map, vec2(cache_uv.x, 0.5 + cache_uv.y * 0.5));
+        } else {
+            // Opaque geometry inside a band must still stop the integration.
+            upper = march_cloud_band(ray_origin, ray_direction, surface_distance,
+                1.0, thickness_scale, detail_contrast, ray_offset);
+        }
+        upper *= cloud_upper_opacity;
     }
     vec4 lower = vec4(0.0);
     if (upper.a < 0.99) {
-        lower = march_cloud_band(ray_origin, ray_direction, surface_distance,
-            0.0, thickness_scale, detail_contrast, ray_offset);
+        if (cached && surface_world.y < cloud_height) {
+            lower = texture(cloud_view_map, vec2(cache_uv.x, cache_uv.y * 0.5));
+        } else {
+            lower = march_cloud_band(ray_origin, ray_direction, surface_distance,
+                0.0, thickness_scale, detail_contrast, ray_offset);
+        }
     }
     vec3 accumulated_color = upper.rgb + (1.0 - upper.a) * lower.rgb;
     float alpha = upper.a + (1.0 - upper.a) * lower.a;

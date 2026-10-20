@@ -4,6 +4,10 @@ uniform sampler2D cloud_noise : repeat_enable, filter_linear;
 uniform sampler3D cloud_volume_noise : repeat_enable, filter_linear;
 uniform sampler3D cloud_base_noise : repeat_enable, filter_linear;
 uniform vec3 cloud_weather_origin = vec3(0.0);
+// A shared one-pixel float texture keeps factory material copies in step with
+// the cloud-only cadence. Native TIME remains available to grass and gameplay.
+uniform sampler2D cloud_clock : repeat_disable, filter_nearest;
+uniform bool cloud_use_clock = false;
 uniform sampler2D cloud_weather_map : repeat_disable, filter_linear;
 uniform bool cloud_use_weather_map = false;
 uniform sampler2D cloud_sunlight_map : repeat_disable, filter_linear;
@@ -37,6 +41,10 @@ uniform float cloud_shadow_softness : hint_range(0.0, 3.0) = 0.25;
 uniform float cloud_upper_shadow_softness : hint_range(0.0, 3.0) = 0.45;
 uniform vec3 sun_direction = vec3(-0.287, 0.819, 0.497);
 
+float cloud_time() {
+    return cloud_use_clock ? texture(cloud_clock, vec2(0.5)).r : TIME;
+}
+
 vec2 cloud_wind_direction() {
     return grass_wind_direction / max(length(grass_wind_direction), 0.001);
 }
@@ -59,14 +67,14 @@ vec2 cloud_band_coordinates(vec2 world_position, float band) {
     vec2 wind = cloud_rotated_wind(cloud_upper_wind_turn * band);
     float speed = cloud_speed * mix(1.0, cloud_upper_speed_multiplier, band);
     float scale = cloud_scale * mix(1.0, cloud_upper_scale, band);
-    return (world_position - TIME * wind * speed) * scale
+    return (world_position - cloud_time() * wind * speed) * scale
         + cloud_weather_origin.xz + band * vec2(0.37, 0.61);
 }
 
 // Continuous weather has no placement cells or individual cloud outlines.
 // Broad gaps, broken patches and stretched filaments share one warped field.
 vec2 cloud_weather(vec2 coordinates, vec2 world_position, float band) {
-    float evolution = TIME * cloud_evolution_speed * mix(1.0, 0.85, band);
+    float evolution = cloud_time() * cloud_evolution_speed * mix(1.0, 0.85, band);
     vec2 warp = vec2(
         texture(cloud_noise, coordinates * 0.9 + vec2(0.17, 0.63)
             + evolution * vec2(0.045, -0.03)).r,
@@ -81,7 +89,7 @@ vec2 cloud_weather(vec2 coordinates, vec2 world_position, float band) {
     if (band > 0.5) {
         // A shared slow humidity pattern gives the layers related clear/cloudy
         // regions, while their local weather and billows remain independent.
-        vec2 humidity = (world_position - TIME * cloud_wind_direction()
+        vec2 humidity = (world_position - cloud_time() * cloud_wind_direction()
             * cloud_speed * 0.55) * cloud_scale + cloud_weather_origin.xz;
         float shared_weather = texture(cloud_noise,
             humidity * 0.3 + vec2(0.31, 0.19)).r;
@@ -152,12 +160,12 @@ float cloud_band_density(vec3 world_position, float band, float detail_contrast)
     float scale = cloud_scale * mix(1.0, cloud_upper_scale, band);
     vec2 wind = cloud_rotated_wind(cloud_upper_wind_turn * band);
     float speed = cloud_speed * mix(1.0, cloud_upper_speed_multiplier, band);
-    vec2 sheared = coordinates - TIME * wind * speed * scale
+    vec2 sheared = coordinates - cloud_time() * wind * speed * scale
         * (altitude - 0.5) * cloud_vertical_shear;
     vec3 p = vec3(sheared.x, (world_position.y - base_height) * scale,
         sheared.y) * mix(2.8, 3.2, band)
         + vec3(0.0, cloud_weather_origin.y, 0.0) + band * vec3(0.43, 0.27, 0.79);
-    float evolution = TIME * cloud_evolution_speed * mix(1.0, 0.85, band);
+    float evolution = cloud_time() * cloud_evolution_speed * mix(1.0, 0.85, band);
     float coherent = texture(cloud_base_noise, p * 0.65 + vec3(0.17, 0.31, 0.61)
         + evolution * vec3(0.04, 0.12, -0.06)).r;
     float billows = texture(cloud_volume_noise, p + vec3(0.41, 0.73, 0.19)
