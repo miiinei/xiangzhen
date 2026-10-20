@@ -1,6 +1,8 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+陷阵.csproj.old
+陷阵.csproj
 
 # .NET / C# build output
 bin/
