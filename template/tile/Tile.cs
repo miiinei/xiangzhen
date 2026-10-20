@@ -18,7 +18,8 @@ public partial class Tile : Node3D
     private static readonly Color TargetPreviewColor = new(1f, 0.2f, 0.2f, 0.32f);
     private static readonly Color MountainColor = new(0.38f, 0.34f, 0.28f);
     private static readonly Color WaterColor = new(0.12f, 0.34f, 0.48f);
-    private static readonly Color GrassColor = new(0.48f, 0.68f, 0.28f);
+    // The painted canopy supplies the palette; a slight cool tint keeps the wet-season greens.
+    private static readonly Color GrassColor = new(0.86f, 0.96f, 1f);
 
     [Export] public Vector2I GridPosition { get; set; }
     [Export] public float HexRadius { get; set; } = DefaultHexRadius;

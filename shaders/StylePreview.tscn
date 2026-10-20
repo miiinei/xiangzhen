@@ -7,6 +7,7 @@
 
 [ext_resource type="Texture3D" path="res://shaders/cloud_base_noise.tres" id="6_base"]
 [ext_resource type="Script" path="res://shaders/CloudWeather.gd" id="7_weather"]
+[ext_resource type="Material" path="res://shaders/grassland.tres" id="8_grass"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 size = Vector2(40, 40)
@@ -31,18 +32,11 @@ shader_parameter/cloud_base_noise = ExtResource("6_base")
 background_mode = 1
 background_color = Color(0.52, 0.73, 0.85, 1)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_grass"]
-shader = ExtResource("3_shader")
-shader_parameter/cloud_noise = ExtResource("4_noise")
-shader_parameter/cloud_volume_noise = ExtResource("5_volume")
-shader_parameter/cloud_base_noise = ExtResource("6_base")
-shader_parameter/grass_wind_strength = 0.45
-
 [node name="StylePreview" type="Node3D"]
 
 [node name="Ground" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_ground")
-material_override = SubResource("ShaderMaterial_grass")
+material_override = ExtResource("8_grass")
 
 [node name="Piece" type="MeshInstance3D" parent="."]
 position = Vector3(0, 1.5, 0)

@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=7 format=3]
+
+[ext_resource type="Shader" path="res://shaders/grassland.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://shaders/cloud_noise.tres" id="2_cloud_noise"]
+[ext_resource type="Texture3D" path="res://shaders/cloud_volume_noise.tres" id="3_volume"]
+[ext_resource type="Texture3D" path="res://shaders/cloud_base_noise.tres" id="4_base"]
+[ext_resource type="Texture2D" path="res://shaders/grass_land_noise.tres" id="5_land"]
+[ext_resource type="Texture2D" path="res://shaders/textures/grassland_canopy.png" id="6_color"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/cloud_noise = ExtResource("2_cloud_noise")
+shader_parameter/cloud_volume_noise = ExtResource("3_volume")
+shader_parameter/cloud_base_noise = ExtResource("4_base")
+shader_parameter/grass_land_noise = ExtResource("5_land")
+shader_parameter/grass_canopy_color = ExtResource("6_color")

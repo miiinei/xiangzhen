@@ -82,9 +82,9 @@
 
 ## 地表、棋子与材质接入
 
-`low_poly.gdshader` 为不透明地块、棋子和建筑提供分档面光照、云影、草风和轻雾。主世界通过 `world/StylizedMaterials.cs` 复制 `low_poly.tres`，按对象覆盖固有色、选中补光和草风强度；Grass 地块使用 0.45 的草风强度，其他对象使用 0。地形与单位颜色由各自的 C# 代码提供，攻击提示、路径和描边使用原有信息材质。
+`low_poly.gdshader` 为山地、水面、棋子和建筑提供分档面光照、云影和轻雾。Grass 地块使用下文的 `grassland.gdshader`。主世界通过 `world/StylizedMaterials.cs` 选择对应模板并复制材质，覆盖对象固有色和选中补光；非草地对象继续使用原模板。地形与单位颜色由各自的 C# 代码提供，攻击提示、路径和描边使用原有信息材质。
 
-其他不透明模型可挂 `low_poly.tres`，需独立调色时复制材质即可，噪声资源继续共享。`StylePreview.tscn` 提供内联地面与棋子材质，在编辑器中打开后按 F6 可独立预览；`CloudWeather` 会给这些材质绑定同一份天气、云影和时钟。
+其他不透明模型可挂 `low_poly.tres`，需独立调色时复制材质即可，噪声资源继续共享。`StylePreview.tscn` 的地面使用 `grassland.tres`，棋子保留内联的原材质，在编辑器中打开后按 F6 可独立预览；`CloudWeather` 会给这些材质绑定同一份天气、云影和时钟。
 
 | 参数 | 默认值 | 用途 |
 | --- | --- | --- |
@@ -92,18 +92,37 @@
 | `ambient_color` / `ambient_strength` | (0.70, 0.79, 0.88) / 0.32 | 阴面补色与环境补光强度 |
 | `direct_strength` / `light_steps` | 0.65 / 3 | 直接光强度与面光照档数 |
 | `selection_glow` | 黑 | 由 C# 设置的选中补光 |
-| `grass_wind_strength` | 0；Grass 地块 0.45 | 草风颜色变化强度 |
-| `grass_wind_speed` | 3 | 风带移动速度，世界单位/秒 |
-| `grass_wind_spacing` / `grass_wind_width` | 32 / 3.5 | 阵风间距与半宽 |
 | `fog_color` | (0.62, 0.78, 0.88) | 远处的大气褪色 |
 | `fog_start` / `fog_end` / `fog_strength` | 35 / 95 / 0.07 | 相机空间距离中的雾起止与最大强度 |
 | `vertex_ao_strength` | 0 | 顶点色 R 通道作为烘焙遮蔽的强度 |
 
-修改模板后重新运行场景，已生成的材质副本不会自动追踪模板的新参数。草风主方向与云共用 `grass_wind_direction`；草风本身仍使用原生 `TIME`，以缓慢弯曲的阵风带改变向上草面的颜色，不生成草叶几何形变。
+修改模板后重新运行场景，已生成的材质副本不会自动追踪模板的新参数。当前 Grass 地块的风动全部由专用材质计算，原材质中已停用的颜色风带及其专用参数已移除；云场共用的 `grass_wind_direction` 仍保留。
 
 光照由片元导数重建三角面的几何法线，并对方向光贡献分档。云影、原生物体投影和雾仍连续变化，因此一个三角面上的最终像素可能不同色。场景使用一个 `DirectionalLight3D`，太阳参数需与云材质同步；环境补光由 shader 计算，未叠加 WorldEnvironment 的环境光，也没有镜面高光。
 
 雾只按相机空间距离褪色，不采样深度，不属于体积雾。顶点遮蔽默认关闭，启用后也只读取烘焙数据；动态物体投影由场景的方向光提供。
+
+## 湿季草原
+
+`grassland.gdshader` / `grassland.tres` 只用于 Grass 地块和美术预览地面。地表以世界 xz 坐标采样，邻格共用连续的颜色与风动分布，不改变六边形网格高度、地形类型、碰撞和移动规则。雨季草原的配色与笔触来自生图制作的 [grassland_canopy.png](textures/grassland_canopy.png)，采用成片草色和冷暖变化；生成来源、完整提示词及使用限制见 [素材说明](textures/grassland_canopy.md)。`Tile.GrassColor` 作为乘法调色，默认轻微偏冷，收住素材中的黄绿色。旧版遍布地面的枯草、湿土、碎斑纹理与细节法线已删除。
+
+草地使用两张共享纹理。草冠图源文件为 1254×1254，导入时限制到 1024 并生成 mipmap。材质分两次读取同一张图：64 km 跨度的第 4 级 mip 只提供平缓色块，较小尺度的镜像采样提供很弱的笔触明暗，避免将微细笔触放大为大片斑点。`grass_land_noise.tres` 为 256×256 的单倍频 Perlin 分布，启用无缝平铺和 mipmap，仅用于阵风形状。每片元合计三次草地纹理采样，云影沿用已有查询。不新增草叶实例、运行时逐草物理、渲染视口或体积积分循环。
+
+草风与云共用 `grass_wind_direction`，地面阵风速度独立标定；草层受光仍按原生 `TIME` 连续更新，不跟随云的 20 次/秒时钟。阵风使用柔和的前缘和较长的恢复段，沿途有强弱和消散，连续改变等效草冠朝向、叶片受光与宽高光，让默认战术视距能够辨认传播过程。地表固有色不随风平移。光照采用连续漫反射与简化的宽高光，高粗糙度控制高光宽度；它不是逐叶片或完整的物理植被模型。云影同时衰减直接漫反射和高光，环境补光保留。
+
+| 参数 | 默认值 | 用途 |
+| --- | --- | --- |
+| `base_color` | (0.86, 0.96, 1) | 草冠图的乘法调色，运行时由 `Tile.GrassColor` 覆盖 |
+| `grass_texture_span` | 64 | 草冠图的世界跨度，单位 km；当前棋盘与预览地面均未跨越纹理重复边缘 |
+| `grass_wind_speed` | 0.085 | 阵风传播的视觉速度，单位 km/s，按战术镜头标定，不代表实测风速 |
+| `grass_wind_strength` | 0.75 | 草冠朝向与受光的响应强度，0 可静止比较 |
+| `grass_wind_spacing` / `grass_wind_width` | 4.8 / 0.85 | 阵风间距与基础恢复段长度，单位 km |
+| `grass_sheen_strength` | 0.075 | 草冠宽高光强度 |
+| `direct_strength` / `ambient_strength` | 1 / 0.35 | 连续直接光和环境补光强度，仅属于草地材质 |
+
+正交相机缩放时保留色差与阵风的世界尺度，较远视角继续保留宽阔阵风和云影。由于已去掉细碎纹理与法线，不再需要旧版的近远细节分支。采样使用 mipmap 过滤。
+
+实现参考方向：[GPU Gems 2 的风动与远处植被明暗](https://developer.nvidia.com/gpugems/gpugems2/part-i-geometric-complexity/chapter-1-toward-photorealism-virtual-botany)、[Terrain3D 的大尺度颜色与材质分层](https://terrain3d.readthedocs.io/en/stable/docs/shader_design.html)、[HTerrain 的远景整体颜色图](https://hterrain-plugin.readthedocs.io/en/latest/#global-map)。本模块是针对现有平坦棋盘的独立实现，未引入这些地形插件。
 
 ## 调参与成本
 

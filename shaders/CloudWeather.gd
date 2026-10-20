@@ -45,7 +45,8 @@ func _enter_tree() -> void:
     # Set the templates before the parent World creates its tile/unit copies.
     # Retain them until the scene exits: ResourceLoader's cache is weak, and
     # World creates its C# material copies after this child's _ready callback.
-    for path in ["res://shaders/cloud_layer.tres", "res://shaders/low_poly.tres"]:
+    for path in ["res://shaders/cloud_layer.tres", "res://shaders/low_poly.tres",
+            "res://shaders/grassland.tres"]:
         var material := load(path) as ShaderMaterial
         material.set_shader_parameter("cloud_weather_origin", weather_origin)
         _bind_clock(material)
@@ -206,7 +207,8 @@ func _ready() -> void:
             continue
         var shader_path := material.shader.resource_path
         var is_cloud := shader_path == "res://shaders/cloud_layer.gdshader"
-        if is_cloud or shader_path == "res://shaders/low_poly.gdshader":
+        if is_cloud or shader_path in ["res://shaders/low_poly.gdshader",
+                "res://shaders/grassland.gdshader"]:
             material.set_shader_parameter("cloud_weather_origin", weather_origin)
             _bind_clock(material)
             _bind_weather_map(material)
