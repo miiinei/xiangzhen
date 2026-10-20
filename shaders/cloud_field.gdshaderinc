@@ -4,6 +4,8 @@ uniform sampler2D cloud_noise : repeat_enable, filter_linear;
 uniform sampler3D cloud_volume_noise : repeat_enable, filter_linear;
 uniform sampler3D cloud_base_noise : repeat_enable, filter_linear;
 uniform vec3 cloud_weather_origin = vec3(0.0);
+uniform sampler2D cloud_weather_map : repeat_disable, filter_linear;
+uniform bool cloud_use_weather_map = false;
 uniform sampler2D cloud_sunlight_map : repeat_disable, filter_linear;
 uniform bool cloud_use_sunlight_map = false;
 uniform vec2 cloud_sunlight_origin = vec2(-48.0);
@@ -18,18 +20,21 @@ uniform float cloud_warp : hint_range(0.0, 1.0) = 0.7;
 uniform float cloud_coverage : hint_range(0.0, 1.0) = 0.5;
 uniform float cloud_softness : hint_range(0.01, 0.4) = 0.26;
 uniform float cloud_density_softness : hint_range(0.01, 0.4) = 0.09;
-uniform float cloud_height = 7.0;
-uniform float cloud_thickness : hint_range(0.5, 8.0) = 3.2;
-uniform float cloud_upper_height = 11.3;
-uniform float cloud_upper_thickness : hint_range(0.5, 8.0) = 2.4;
+// One scene unit represents one kilometre, matching the hexagon edge length.
+uniform float cloud_height = 1.5;
+uniform float cloud_thickness : hint_range(0.5, 8.0) = 0.8;
+uniform float cloud_density : hint_range(0.0, 8.0) = 4.0;
+uniform float cloud_upper_height = 4.0;
+uniform float cloud_upper_thickness : hint_range(0.5, 8.0) = 0.7;
 uniform float cloud_upper_coverage : hint_range(0.0, 1.0) = 0.42;
 uniform float cloud_upper_scale : hint_range(0.5, 2.0) = 1.15;
-uniform float cloud_upper_density : hint_range(0.0, 2.0) = 0.95;
+uniform float cloud_upper_density : hint_range(0.0, 8.0) = 3.25;
 uniform float cloud_upper_speed_multiplier : hint_range(0.0, 3.0) = 1.35;
 uniform float cloud_upper_wind_turn : hint_range(-1.57, 1.57) = 0.22;
 uniform float cloud_vertical_shear : hint_range(0.0, 0.3) = 0.08;
 uniform float cloud_upper_shadow_strength : hint_range(0.0, 1.0) = 1.0;
-uniform float cloud_shadow_softness : hint_range(0.0, 3.0) = 0.65;
+uniform float cloud_shadow_softness : hint_range(0.0, 3.0) = 0.25;
+uniform float cloud_upper_shadow_softness : hint_range(0.0, 3.0) = 0.45;
 uniform vec3 sun_direction = vec3(-0.287, 0.819, 0.497);
 
 vec2 cloud_wind_direction() {
@@ -102,6 +107,18 @@ vec2 cloud_weather(vec2 coordinates, vec2 world_position, float band) {
     return vec2(envelope, veil * filaments * (1.0 - envelope * 0.5));
 }
 
+// Horizontal coverage is independent of sample altitude. Reuse one shared
+// weather lookup instead of recomputing its noise at every view/light step.
+vec2 cloud_band_weather(vec2 world_position, vec2 coordinates, float band) {
+    vec2 uv = (world_position - cloud_sunlight_origin) / cloud_sunlight_span;
+    if (cloud_use_weather_map && min(uv.x, uv.y) > 0.002
+            && max(uv.x, uv.y) < 0.998) {
+        vec4 weather = texture(cloud_weather_map, uv);
+        return mix(weather.rg, weather.ba, band);
+    }
+    return cloud_weather(coordinates, world_position, band);
+}
+
 // Rounded positive part extends the density gently into the eroded edge,
 // keeping the dense core intact while avoiding a sharp zero-density boundary.
 float cloud_soft_density(float shape) {
@@ -119,12 +136,12 @@ float cloud_band_density(vec3 world_position, float band, float detail_contrast)
     if (altitude <= 0.0 || altitude >= 1.0) {
         return 0.0;
     }
-    float density_scale = mix(1.0, cloud_upper_density, band);
+    float density_scale = mix(cloud_density, cloud_upper_density, band);
     if (density_scale <= 0.0) {
         return 0.0;
     }
     vec2 coordinates = cloud_band_coordinates(world_position.xz, band);
-    vec2 weather = cloud_weather(coordinates, world_position.xz, band);
+    vec2 weather = cloud_band_weather(world_position.xz, coordinates, band);
     if (max(weather.x, weather.y) < 0.005) {
         return 0.0;
     }
@@ -201,7 +218,8 @@ float cloud_band_shadow_depth(vec3 receiver_position, float band) {
     float optical_depth = 0.0;
     for (int i = 0; i < 4; i++) {
         float angle = float(i) * 1.5707963;
-        vec2 penumbra = vec2(cos(angle), sin(angle)) * cloud_shadow_softness;
+        float softness = mix(cloud_shadow_softness, cloud_upper_shadow_softness, band);
+        vec2 penumbra = vec2(cos(angle), sin(angle)) * softness;
         vec3 sample_position = start + sunlight * (float(i) + 0.5) * step_length;
         sample_position.xz += penumbra;
         optical_depth += cloud_band_density(sample_position, band, 1.0) * step_length;

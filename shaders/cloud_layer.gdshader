@@ -8,8 +8,8 @@ render_mode unshaded, blend_mix, depth_draw_never, depth_test_disabled, cull_dis
 uniform sampler2D scene_depth : hint_depth_texture, repeat_disable, filter_nearest;
 uniform vec4 cloud_color : source_color = vec4(0.965, 0.975, 0.985, 1.0);
 uniform vec4 cloud_shade_color : source_color = vec4(0.28, 0.34, 0.42, 1.0);
-uniform float cloud_opacity : hint_range(0.0, 1.0) = 0.65;
-uniform float unit_cloud_opacity : hint_range(0.0, 1.0) = 0.25;
+uniform float cloud_opacity : hint_range(0.0, 1.0) = 0.38;
+uniform float unit_cloud_opacity : hint_range(0.0, 1.0) = 0.08;
 uniform float unit_far_cloud_opacity : hint_range(0.0, 1.0) = 1.0;
 uniform float cloud_extinction : hint_range(0.1, 4.0) = 1.2;
 uniform float cloud_light_extinction : hint_range(0.1, 6.0) = 1.6;
@@ -19,6 +19,7 @@ uniform int cloud_upper_steps : hint_range(8, 32, 4) = 16;
 uniform float cloud_upper_opacity : hint_range(0.0, 1.0) = 1.0;
 uniform float cloud_far_opacity : hint_range(0.0, 1.0) = 1.0;
 uniform vec2 cloud_zoom_range = vec2(20.0, 40.0);
+uniform vec2 cloud_close_fade_range = vec2(8.0, 14.0);
 uniform float cloud_near_thickness_scale : hint_range(0.05, 1.0) = 0.34375;
 uniform float cloud_far_detail : hint_range(0.0, 1.0) = 0.65;
 
@@ -27,7 +28,7 @@ uniform float cloud_far_detail : hint_range(0.0, 1.0) = 0.65;
 uniform vec2 cloud_cirrus_zoom_range = vec2(34.0, 40.0);
 uniform float cloud_cirrus_opacity : hint_range(0.0, 0.5) = 0.16;
 uniform vec4 cloud_cirrus_color : source_color = vec4(0.88, 0.94, 0.985, 1.0);
-uniform float cloud_cirrus_height = 16.0;
+uniform float cloud_cirrus_height = 9.0;
 
 vec3 cloud_reference_position(vec3 world_position, float band, float thickness_scale) {
     float base_height = cloud_band_height(band);
@@ -122,7 +123,14 @@ void fragment() {
     float zoom_blend = smoothstep(cloud_zoom_range.x,
         max(cloud_zoom_range.y, cloud_zoom_range.x + 0.01), view_size);
     float thickness_scale = mix(cloud_near_thickness_scale, 1.0, zoom_blend);
-    float view_opacity = mix(cloud_opacity, cloud_far_opacity, zoom_blend);
+    // The camera now stays above the low clouds even at its closest zoom.
+    // Fade their display explicitly; physical density and shadows stay intact.
+    float close_fade = smoothstep(cloud_close_fade_range.x,
+        max(cloud_close_fade_range.y, cloud_close_fade_range.x + 0.01), view_size);
+    float view_opacity = mix(cloud_opacity, cloud_far_opacity, zoom_blend) * close_fade;
+    if (view_opacity < 0.001) {
+        discard;
+    }
     float detail_contrast = mix(1.0, cloud_far_detail, zoom_blend);
     vec2 screen = SCREEN_UV * 2.0 - 1.0;
     // Godot 4.3+ uses reversed Z. Compatibility NDC spans [-1, 1].

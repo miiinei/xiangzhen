@@ -6,6 +6,8 @@ extends Node
 var actual_seed: int
 var weather_origin: Vector3
 var _templates: Array[ShaderMaterial] = []
+var _weather_viewport: SubViewport
+var _weather_material: ShaderMaterial
 var _sunlight_viewport: SubViewport
 var _sunlight_material: ShaderMaterial
 
@@ -25,7 +27,36 @@ func _enter_tree() -> void:
         var material := load(path) as ShaderMaterial
         material.set_shader_parameter("cloud_weather_origin", weather_origin)
         _templates.append(material)
+    _create_weather_map()
     _create_sunlight_map()
+
+func _create_weather_map() -> void:
+    _weather_material = ShaderMaterial.new()
+    _weather_material.shader = load("res://shaders/cloud_weather.gdshader")
+    for parameter in _weather_material.shader.get_shader_uniform_list():
+        var key: StringName = parameter["name"]
+        if key in [&"cloud_weather_map", &"cloud_use_weather_map",
+                &"cloud_sunlight_map", &"cloud_use_sunlight_map"]:
+            continue
+        var value = _templates[0].get_shader_parameter(key)
+        if value != null:
+            _weather_material.set_shader_parameter(key, value)
+    _weather_viewport = SubViewport.new()
+    _weather_viewport.name = "CloudCoverage"
+    _weather_viewport.size = Vector2i(512, 512)
+    _weather_viewport.disable_3d = true
+    _weather_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+    add_child(_weather_viewport)
+    var surface := ColorRect.new()
+    surface.size = Vector2(512.0, 512.0)
+    surface.material = _weather_material
+    _weather_viewport.add_child(surface)
+    for material in _templates:
+        _bind_weather_map(material)
+
+func _bind_weather_map(material: ShaderMaterial) -> void:
+    material.set_shader_parameter("cloud_weather_map", _weather_viewport.get_texture())
+    material.set_shader_parameter("cloud_use_weather_map", true)
 
 func _create_sunlight_map() -> void:
     _sunlight_material = ShaderMaterial.new()
@@ -61,4 +92,5 @@ func _ready() -> void:
         if material != null and material.shader.resource_path in [
                 "res://shaders/cloud_layer.gdshader", "res://shaders/low_poly.gdshader"]:
             material.set_shader_parameter("cloud_weather_origin", weather_origin)
+            _bind_weather_map(material)
             _bind_sunlight_map(material)

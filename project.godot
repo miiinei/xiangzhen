@@ -17,6 +17,7 @@ general/accessibility_support=false
 config/name="陷阵-editiing"
 run/main_scene="res://world/world.tscn"
 config/features=PackedStringArray("4.6", "C#", "GL Compatibility")
+run/max_fps=60
 
 [display]
 
