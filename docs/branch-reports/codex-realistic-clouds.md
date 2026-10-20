@@ -7,28 +7,28 @@ prior_report_approval_ref: A006
 branch: codex/realistic-clouds
 base_ref: master
 base_commit: d6b1545b527bd8165b8a6c1e8b4817ec695828bc
-reviewed_commit: 2cbfa3975b6de1f296b2a6ebcbca2d8bedc136f4
+reviewed_commit: e9dafc8001d52878151435bb21b6a749fcdb29c8
 target_ref: origin/master
 target_observed_commit: d6b1545b527bd8165b8a6c1e8b4817ec695828bc
-remote_branch_observed_commit: 6615014bc73055978033dd846223232ac9711c52
+remote_branch_observed_commit: 8696b8b6e94a85e84835790db9013556436e546e
 remote_observation_phase: PRE_PUSH
 checked_on: 2026-10-20
 timezone: Asia/Shanghai
 comparison: base_commit..reviewed_commit
 scope: COMMITTED_NET_DIFF_EXCLUDING_REPORT
-changed_file_count: 25
-insertions: 1077
-deletions: 167
-post_base_commit_count: 10
+changed_file_count: 34
+insertions: 1275
+deletions: 184
+post_base_commit_count: 12
 post_base_merge_commit_count: 0
 upstream_sync_status: NO_POST_BASE_MAINLINE_UPDATE_OBSERVED
-runtime_validation_this_review: RUNTIME_CHECKED
+runtime_validation_this_review: NOT_RUN
 merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 ---
 
-# 云开发分支变更报告
+# 云与草原开发分支变更报告
 
-本报告在 A006 已审阅的初版基础上，按 A010 的本次改进提交／推送要求更新；本次新增内容尚未经用户单独审阅，记录为 `UPDATED_NOT_USER_REVIEWED`，不据此要求重复确认已授权的提交／推送。统计覆盖固定起点到 `reviewed_commit` 的 25 个非报告变更文件；完整文件索引另列报告自身，合计 26 个路径。本地未提交改动见 [本地排除项](#local-only)。远端观察值在本次推送前读取，不代表推送后的分支指针。
+本报告沿用固定起点，保留 A006 对初版报告的审阅事实。本次按 A014 保存并推送第二版草原原型，新增 C011～C014；本次扩展记录为 `UPDATED_NOT_USER_REVIEWED`，不要求重复确认已授权的提交／推送。`reviewed_commit` 已核对到本次草原代码提交 `e9dafc8`；统计覆盖固定起点到该核对点的 34 个非报告文件，完整文件索引另含报告自身，合计 35 个路径。工作区原有工具链差异见本地排除项。用户仍指出地势、植被层次不足和草浪塑料感，当前推送用于保存可运行原型，不表示美术效果验收完成。远端指针是本次推送前读取值。
 
 导航：[字段约定](#schema) · [模块索引](#modules) · [完整文件索引](#files) · [额外授权索引](#permissions) · [引入依赖](#integration) · [变更条目](#changes) · [提交索引](#commits) · [授权证据](#approvals) · [验证证据](#validation) · [协作检查](#collaboration) · [本地排除项](#local-only) · [待决定事项](#decisions)
 
@@ -39,13 +39,13 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 
 | 字段 | 允许值及含义 |
 | --- | --- |
-| `report_status` / `report_approval_ref` | `USER_REVIEWED` 表示对应版本已获用户审阅；`UPDATED_NOT_USER_REVIEWED` 表示本次更新尚未单独审阅。A006 保留为初版审阅记录，A009 授权上一轮云版本推送，A010 授权本轮两项改进提交／推送；两者均不代表合并或完整运行验收。 |
+| `report_status` / `report_approval_ref` | `USER_REVIEWED` 表示对应版本已获用户审阅；`UPDATED_NOT_USER_REVIEWED` 表示本次更新尚未单独审阅。A006 保留为初版审阅记录，A009 授权上一轮云版本推送，A010 授权两项质量修复提交／推送；A011～A013 授权草原实现、修订清理与生图资产，A014 授权本次草原版本提交／推送。各项不代表合并或完整运行／美术验收。 |
 | `status` | `ACTIVE` 为当前有效变化，省略时按此值处理；`WITHDRAWN` 为已撤回、退出当前引入候选的历史条目，编号不复用。 |
 | `impact_type` | `MODULE_LOCAL` 模块内部；`SHARED_INTEGRATION` 共用接线；`PROJECT_GLOBAL` 项目级运行行为；`DOCUMENTATION` 文档与来源记录；`DEVELOPMENT_WORKFLOW` 开发工具的项目约定。 |
 | `requires_extra_approval` | `true` 表示按当前本地约定需要额外明确批准；`false` 表示本条位于已授权任务范围内。不能由此判断验证是否通过。 |
 | `approval_status` | `IN_SCOPE` 已有任务范围覆盖；`EXPLICITLY_APPROVED` 找到对应明确要求；`UNCONFIRMED` 额外授权证据尚未确认，不等同于断言从未批准。 |
 | `integration_mode` | `INDEPENDENT` 可独立审阅／选择引入的候选；`WITH_DEPENDENCIES` 应按指定依赖组引入；`REVIEW_REQUIRED` 需要单独决定。均不表示已批准合并。 |
-| `validation_status` | `NOT_RUN` 本次未验证；`STATIC_CHECKED` 本次核对源码、差异或 Git 行为；`RUNTIME_CHECKED` 对明确版本实际运行验证。云模块保留 H001～H005 的实施阶段记录；C009 和 C010 本轮按 V005/H006 记录构建、导入、演示与生命周期检查。 |
+| `validation_status` | `NOT_RUN` 本次未验证；`STATIC_CHECKED` 本次核对源码、差异或 Git 行为；`RUNTIME_CHECKED` 对明确版本实际运行验证。云模块保留 H001～H005，质量修复保留 V005/H006；草原实现阶段运行记录为 H007，本次推送准备仅做 V006 静态核对，没有重跑游戏。 |
 | `origin` | `THIS_BRANCH` 本开发分支引入；`UPSTREAM_SYNC` 主分支同步；`LOCAL_ONLY` 工作区独有。当前已提交条目均为 `THIS_BRANCH`。 |
 | `approval_refs` / `validation_refs` | 指向本报告的 `Axxx` / `Vxxx` / `Hxxx` 证据编号；缺失的原始证据不得用助手结论或提交说明替代。 |
 | `depends_on` / `integration_group` | 条目依赖与配套引入组；组内文件不按单文件复制作为默认接入方式。 |
@@ -67,40 +67,53 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 | 缓存初始化与参数组织整理 | [C008](#c008) | `_create_cache_material()`、`_create_cache_viewport()`、最终显示参数归属 |
 | 技能节点生命周期修复 | [C009](#c009) | `Piece._Notification(NotificationPredelete)` |
 | 删除无引用空资源 | [C010](#c010) | 删除零字节 `template/tile/GrassWindNoise.tres` |
+| 草原专用材质与风动 | [C011](#c011) | grassland.fragment()/light()、Tile.GrassColor、StylizedMaterials.Create() |
+| 草原云影与预览接线 | [C012](#c012) | CloudWeather 模板／接收绑定、StylePreview.Ground |
+| 停用草风清理 | [C013](#c013) | low_poly 旧草风及工厂旧参数赋值删除 |
+| 生图草冠素材 | [C014](#c014) | grassland_canopy.png、导入参数和生成提示词 |
 
 <a id="files"></a>
 ## 完整文件索引
 
 | 状态 | 文件 | 新增／删除 | 条目 | 稳定定位点 |
 | --- | --- | --- | --- | --- |
-| M | [.gitignore](../../.gitignore) | 3 / 0 | [C006](#c006) | `/AGENTS.md` |
-| A | [shaders/CLOUDS_LICENSES.md](../../shaders/CLOUDS_LICENSES.md) | 115 / 0 | [C005](#c005) | 四个来源、固定版本和 MIT 原文 |
-| A | [shaders/CloudWeather.gd](../../shaders/CloudWeather.gd) | 216 / 0 | [C002](#c002)、[C007](#c007)、[C008](#c008) | 模板绑定、三份缓存、独立时钟与共用初始化 |
+| M | [.gitignore](../../.gitignore) | 3 / 0 | [C006](#c006) | 本地规则文件的忽略条目 |
+| A | [shaders/CLOUDS_LICENSES.md](../../shaders/CLOUDS_LICENSES.md) | 115 / 0 | [C005](#c005) | 云参考来源、固定版本与许可 |
+| A | [shaders/CloudWeather.gd](../../shaders/CloudWeather.gd) | 218 / 0 | [C002](#c002)、[C007](#c007)、[C008](#c008)、[C012](#c012) | _enter_tree()、缓存创建、_ready() 草地接收绑定 |
 | A | [shaders/CloudWeather.gd.uid](../../shaders/CloudWeather.gd.uid) | 1 / 0 | [C002](#c002) | Godot 脚本 UID |
-| M | [shaders/README.md](../../shaders/README.md) | 105 / 94 | [C005](#c005)、[C007](#c007)、[C008](#c008) | 当前参数、更新节奏、接入与成本 |
-| M | [shaders/StylePreview.tscn](../../shaders/StylePreview.tscn) | 21 / 10 | [C003](#c003) | 相机子节点 CloudLayer、CloudWeather 和内联材质 |
+| M | [shaders/README.md](../../shaders/README.md) | 116 / 86 | [C005](#c005)、[C011](#c011)、[C014](#c014) | 云与草原参数、接入和成本说明 |
+| M | [shaders/StylePreview.tscn](../../shaders/StylePreview.tscn) | 21 / 16 | [C003](#c003)、[C012](#c012) | Ground.material_override、CloudWeather |
 | A | [shaders/cloud_base_noise.tres](../../shaders/cloud_base_noise.tres) | 14 / 0 | [C001](#c001) | 96³ Perlin 主体噪声 |
-| M | [shaders/cloud_field.gdshaderinc](../../shaders/cloud_field.gdshaderinc) | 266 / 33 | [C001](#c001)、[C007](#c007) | 密度、完整云影与 `cloud_time()` |
-| M | [shaders/cloud_layer.gdshader](../../shaders/cloud_layer.gdshader) | 130 / 12 | [C001](#c001)、[C007](#c007)、[C008](#c008) | 实时深度、缓存重新投放和最终显示参数 |
-| M | [shaders/cloud_layer.tres](../../shaders/cloud_layer.tres) | 8 / 2 | [C001](#c001) | 三维噪声绑定、透明绘制优先级 |
-| M | [shaders/cloud_noise.tres](../../shaders/cloud_noise.tres) | 2 / 2 | [C001](#c001) | 水平天气噪声的频率与倍频数 |
-| A | [shaders/cloud_optics.gdshaderinc](../../shaders/cloud_optics.gdshaderinc) | 81 / 0 | [C001](#c001)、[C007](#c007)、[C008](#c008) | 共用的视线积分与采样参数 |
+| M | [shaders/cloud_field.gdshaderinc](../../shaders/cloud_field.gdshaderinc) | 266 / 33 | [C001](#c001)、[C007](#c007) | cloud_band_density()、cloud_time()、共享风向 |
+| M | [shaders/cloud_layer.gdshader](../../shaders/cloud_layer.gdshader) | 130 / 12 | [C001](#c001)、[C007](#c007)、[C008](#c008) | 实时深度、视线缓存投放与显示参数 |
+| M | [shaders/cloud_layer.tres](../../shaders/cloud_layer.tres) | 8 / 2 | [C001](#c001) | 云噪声绑定与透明优先级 |
+| M | [shaders/cloud_noise.tres](../../shaders/cloud_noise.tres) | 2 / 2 | [C001](#c001) | 水平天气噪声 |
+| A | [shaders/cloud_optics.gdshaderinc](../../shaders/cloud_optics.gdshaderinc) | 81 / 0 | [C001](#c001)、[C007](#c007)、[C008](#c008) | 共用视线积分与调度 |
 | A | [shaders/cloud_optics.gdshaderinc.uid](../../shaders/cloud_optics.gdshaderinc.uid) | 1 / 0 | [C007](#c007) | Godot include UID |
-| A | [shaders/cloud_sunlight.gdshader](../../shaders/cloud_sunlight.gdshader) | 16 / 0 | [C002](#c002) | 完整云场的太阳透射 RGB 通道 |
-| A | [shaders/cloud_sunlight.gdshader.uid](../../shaders/cloud_sunlight.gdshader.uid) | 1 / 0 | [C002](#c002) | Godot 着色器 UID |
-| A | [shaders/cloud_view.gdshader](../../shaders/cloud_view.gdshader) | 29 / 0 | [C007](#c007) | 两层预乘颜色／透明度图集 |
-| A | [shaders/cloud_view.gdshader.uid](../../shaders/cloud_view.gdshader.uid) | 1 / 0 | [C007](#c007) | Godot 着色器 UID |
+| A | [shaders/cloud_sunlight.gdshader](../../shaders/cloud_sunlight.gdshader) | 16 / 0 | [C002](#c002) | 太阳透射缓存 RGB 通道 |
+| A | [shaders/cloud_sunlight.gdshader.uid](../../shaders/cloud_sunlight.gdshader.uid) | 1 / 0 | [C002](#c002) | Godot shader UID |
+| A | [shaders/cloud_view.gdshader](../../shaders/cloud_view.gdshader) | 29 / 0 | [C007](#c007) | 两层预乘颜色与透明度图集 |
+| A | [shaders/cloud_view.gdshader.uid](../../shaders/cloud_view.gdshader.uid) | 1 / 0 | [C007](#c007) | Godot shader UID |
 | A | [shaders/cloud_volume_noise.tres](../../shaders/cloud_volume_noise.tres) | 17 / 0 | [C001](#c001) | 96³ cellular 云泡与侵蚀噪声 |
 | A | [shaders/cloud_weather.gdshader](../../shaders/cloud_weather.gdshader) | 15 / 0 | [C002](#c002) | 上下层覆盖与云丝 RG/BA 通道 |
-| A | [shaders/cloud_weather.gdshader.uid](../../shaders/cloud_weather.gdshader.uid) | 1 / 0 | [C002](#c002) | Godot 着色器 UID |
-| M | [shaders/low_poly.gdshader](../../shaders/low_poly.gdshader) | 3 / 7 | [C003](#c003) | `fragment()` 的云影接收 |
-| M | [shaders/low_poly.tres](../../shaders/low_poly.tres) | 7 / 2 | [C003](#c003) | 共用云场的三维噪声绑定 |
-| M | [world/world.tscn](../../world/world.tscn) | 10 / 5 | [C003](#c003) | `Camera3D/CloudLayer` 与 CloudWeather 节点 |
-| M | [template/Piece/Piece.cs](../../template/Piece/Piece.cs) | 14 / 0 | [C009](#c009) | 棋子销毁时释放未挂树技能 |
-| D | `template/tile/GrassWindNoise.tres` | 0 / 0 | [C010](#c010) | 已删除零字节、无引用资源；删除项不链接到不存在的文件 |
-| A | [docs/branch-reports/codex-realistic-clouds.md](codex-realistic-clouds.md) | 不计入代码统计 | `REPORT_ONLY` | 报告自身，随独立文档提交维护 |
+| A | [shaders/cloud_weather.gdshader.uid](../../shaders/cloud_weather.gdshader.uid) | 1 / 0 | [C002](#c002) | Godot shader UID |
+| A | [shaders/grass_land_noise.tres](../../shaders/grass_land_noise.tres) | 14 / 0 | [C011](#c011) | 256² 单倍频 Perlin 阵风形状 |
+| A | [shaders/grassland.gdshader](../../shaders/grassland.gdshader) | 98 / 0 | [C011](#c011) | fragment() 草冠采样与阵风、light() 连续受光和宽高光 |
+| A | [shaders/grassland.gdshader.uid](../../shaders/grassland.gdshader.uid) | 1 / 0 | [C011](#c011) | Godot shader UID |
+| A | [shaders/grassland.tres](../../shaders/grassland.tres) | 16 / 0 | [C011](#c011)、[C014](#c014) | 草冠、阵风和云噪声资源绑定 |
+| M | [shaders/low_poly.gdshader](../../shaders/low_poly.gdshader) | 3 / 21 | [C003](#c003)、[C013](#c013) | 云影接收；删除停用的旧草风参数与计算 |
+| M | [shaders/low_poly.tres](../../shaders/low_poly.tres) | 7 / 2 | [C003](#c003) | 云场三维噪声绑定 |
+| A | [shaders/textures/grassland_canopy.md](../../shaders/textures/grassland_canopy.md) | 11 / 0 | [C014](#c014) | 生成来源、完整提示词、采样尺度与限制 |
+| A | [shaders/textures/grassland_canopy.png](../../shaders/textures/grassland_canopy.png) | 二进制，3,015,254 字节 | [C014](#c014) | 1254² RGB 生图草冠源图 |
+| A | [shaders/textures/grassland_canopy.png.import](../../shaders/textures/grassland_canopy.png.import) | 40 / 0 | [C014](#c014) | 1024 尺寸上限、mipmap 与资产 UID |
+| M | [template/Piece/Piece.cs](../../template/Piece/Piece.cs) | 14 / 0 | [C009](#c009) | Piece._Notification(NotificationPredelete) |
+| D | `template/tile/GrassWindNoise.tres` | 0 / 0 | [C010](#c010) | 已删除的无引用零字节资源 |
+| M | [template/tile/Tile.cs](../../template/tile/Tile.cs) | 2 / 1 | [C011](#c011) | GrassColor 改为草冠图的乘法调色 |
+| M | [world/StylizedMaterials.cs](../../world/StylizedMaterials.cs) | 3 / 4 | [C011](#c011)、[C013](#c013) | Create() 选择草地模板，移除旧草风赋值 |
+| M | [world/world.tscn](../../world/world.tscn) | 10 / 5 | [C003](#c003) | Camera3D/CloudLayer 与 CloudWeather 节点 |
+| M | [docs/branch-reports/codex-realistic-clouds.md](codex-realistic-clouds.md) | 不计入代码统计 | `REPORT_ONLY` | 固定分支报告，单独文档提交 |
 
-代码统计：25 个文件，1077 行新增、167 行删除。另有报告自身 1 个路径，不参与代码增删统计。`project.godot` 已与固定起点逐字节一致，退出净差异文件表；其撤回历史仍保留在 C004。
+代码统计：34 个非报告文件，文本 1275 行新增、184 行删除，另有 1 个二进制素材；报告自身单列。`project.godot` 继续与固定起点逐字节一致；`.gitignore` 与 `.csproj` 的工作区原有差异不在上述提交统计内。
 
 <a id="permissions"></a>
 ## 额外授权索引
@@ -113,6 +126,10 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 | 配套文档 | [C005](#c005) | 参数、来源和当前实现说明，随云功能配套更新。 |
 | 本地约定的对应明确要求 | [C006](#c006) | A004 授权忽略规则单独提交；AGENTS.md 正文继续只保留在本地。 |
 | 新增的明确改进范围 | [C009](#c009)、[C010](#c010) | A010 在两项差异已解释后，授权将有实际改进作用的内容推送；两项均保留，单独作为质量修复提交。 |
+| 草原模块与必要共用接线 | [C011](#c011)、[C012](#c012) | A011 授权实施，A012 授权修订；只改变 Grass 的材质及其天气接收，不改变项目设置、战斗和地图格式。 |
+| 旧草风清理 | [C013](#c013) | A012 明确要求删除无用旧版代码；保留其他对象的分档光照与共享云风方向。 |
+| 生图素材 | [C014](#c014) | A013 明确提出用生图制作美术资产，纳入项目并保留完整提示词。 |
+| 本次草原提交／推送 | C011～C014 | A014 为明确 Git 授权，不表示新增地形功能、主分支合并或最终美术验收。 |
 | 本轮提交／推送 | 质量修复及报告更新 | A010；不包含 AGENTS.md 正文、其他新模块或主分支合并。 |
 
 原 C004 添加时的事前独立批准仍记为未确认；本次明确撤回不追溯改写该历史。
@@ -125,6 +142,7 @@ merge_decision: NOT_AUTHORIZED_BY_THIS_REPORT
 | `G001` 云功能配套组 | C001、C002、C003、C005、C007、C008 | 云场、噪声、控制器、三份缓存、共用积分、接收材质、场景和说明配套引入；新的云层 shader 会读取视线缓存，不能只复制单个文件。 |
 | 独立候选 | C006 | `ab989dd` 仅修改 `.gitignore`，按目标项目的本地规则约定审阅。 |
 | 独立质量修复 | C009、C010 | 技能释放和空资源删除不依赖云功能组；本轮在同一独立修复提交中提供，可按对应差异审阅。 |
+| `G002` 草原配套组 | C011、C012、C013、C014、C005 | 草原 shader／材质／纹理、材质工厂、Grass 调色、天气接收和预览配套；依赖 G001 的云场 include 与控制器。旧草风清理与模板切换一并引入，不能只复制工厂或只删 shader 参数。 |
 | 已撤回，退出候选 | C004 | `7d3d951` 添加全局上限；`d9557f2` 已单独移除。当前分支末端的 `project.godot` 与固定起点完全一致。 |
 
 选择历史 `7d3d951` 时仍会带入旧 FPS 键；选择当前云版本时应同时包含其后续恢复与独立更新提交，或审阅相应净差异。本次没有重写历史，也没有合并主分支。
@@ -189,7 +207,7 @@ validation_refs: [V001, V002, V004, H002, H003, H004, H005]
 
 | 生产端 | 输出 | 消费端 |
 | --- | --- | --- |
-| `CloudWeather._enter_tree()` | 本局 weather_origin；weather_seed=0 随机，非零可复现，使用独立 RNG。 | 云和 low_poly 模板，以及工厂后续创建的材质副本。 |
+| `CloudWeather._enter_tree()` | 本局 weather_origin；weather_seed=0 随机，非零可复现，使用独立 RNG。 | 云、low_poly 与草原模板，以及工厂后续创建的材质副本；草原新增绑定见 C012。 |
 | `cloud_weather.gdshader` / CloudCoverage | 512×512；RG 为下层覆盖和云丝，BA 为上层；按 C007 的 20 Hz 节奏更新。 | 可见密度、自遮光及阴影的水平天气查询。 |
 | `cloud_sunlight.gdshader` / CloudSunlight | 256×256；R/G 为下／上层地面透射，B 为上层向下层透射；同节奏更新。 | 地表、单位云影及下层云受光。 |
 | `_ready()` | 对预览内联材质绑定同一原点、时钟和缓存。 | 独立美术预览。 |
@@ -220,11 +238,11 @@ validation_refs: [V001, V002, H003, V004, H004, H005]
 | --- | --- | --- |
 | `low_poly.fragment()` | 用平面高度投影采样旧二维云量。 | 调用 `cloud_shadow(world_position)`，使地块和单位受两层云影影响；云影强度默认值 `0.52 → 0.42`。 |
 | `low_poly.tres` | 只有二维云噪声。 | 增加两份三维云噪声，满足共享云场采样需求。 |
-| `grass_wind_direction` | 在 `low_poly` 内定义。 | 移到共享 include；名字与默认值 `(0.92,0.38)` 不变。草风速度、强度及分布公式未修改。 |
+| `grass_wind_direction` | 在 `low_poly` 内定义。 | 移到共享 include；名字与默认值 `(0.92,0.38)` 不变。云接线阶段未修改草风公式；当前 Grass 风动已由 C011/C013 替换。 |
 | `world/world.tscn` | 根节点下的 `CloudLayer`；100×100 PlaneMesh，位置 `(16,7,14)`。 | 改为 `Camera3D/CloudLayer`；2×2 QuadMesh，相机局部位置 `(0,0,-1)`；新增根节点 `CloudWeather`。世界云高由 C001 的参数决定。 |
 | `StylePreview.tscn` | 根节点下的平面云层，缺少新控制器与三维噪声绑定。 | 同步相机子节点云层、控制器与内联材质资源。 |
 
-云影接线本身没有改写消费端 C# 业务流程；本轮独立的技能释放修复另见 C009。已有消费路径：`world/StylizedMaterials.cs::Create()` 复制 `low_poly.tres`，`template/tile/Tile.cs` 与 `template/Piece/Piece.cs` 使用该工厂。此次变化因此会改变它们表面的云影，但没有重写颜色、选中高亮、草风、雾或原有分档光照公式。
+云影接线本身没有改写消费端 C# 业务流程；本轮独立的技能释放修复另见 C009。已有消费路径：`template/tile/Tile.cs` 与 `template/Piece/Piece.cs` 使用 `world/StylizedMaterials.cs::Create()`。云接线阶段统一复制 `low_poly.tres`，未改写颜色、草风、雾或分档光照；当前 Grass 的专用模板选择和调色另由 A011～A013 授权，见 C011～C014，不追溯扩大原云任务范围。
 
 协作交集：接收着色器、材质模板、两个场景均属于需与其他模块共同核对的文件。`World.cs` 的相机移动／缩放代码未修改；新增相机子节点仍会使其他相机方案与云显示存在集成依赖。
 
@@ -263,7 +281,7 @@ impact_type: DOCUMENTATION
 requires_extra_approval: false
 approval_status: IN_SCOPE
 approval_refs: [A001, A002, A007, A008]
-source_commits: [5731b0a, 799da11, 7d3d951, 08515f0]
+source_commits: [5731b0a, 799da11, 7d3d951, 08515f0, e9dafc8001d52878151435bb21b6a749fcdb29c8]
 integration_mode: WITH_DEPENDENCIES
 integration_group: G001
 depends_on: []
@@ -365,7 +383,7 @@ validation_refs: [V005, H006]
 
 此前 Piece.EnsureSkills() 会实例化尚未挂树的 Skill，面板稍后才将其放入 UI；销毁棋子时，这些脱离场景树的节点没有清理。当前 Piece._Notification() 仅在 NotificationPredelete 时，释放仍有效且 GetParent()==null 的技能。已挂在 UI 等父节点下的技能不在此处主动释放。
 
-修改共 14 行，位于共用棋子基类，作用于技能的生命周期；不改变技能效果、移动、攻击或数值规则。V005 在最新源码副本中复核未选中退出、面板切换后退出、单位死亡，三种情况各检查 14 个技能节点，均通过，未发现清理其他存活棋子技能或退出残留节点的问题。
+修改共 14 行，位于共用棋子基类，作用于技能的生命周期；不改变技能效果、移动、攻击或数值规则。V005 在当时的 2cbfa39 源码副本中复核未选中退出、面板切换后退出、单位死亡，三种情况各检查 14 个技能节点，均通过，未发现清理其他存活棋子技能或退出残留节点的问题。
 
 <a id="c010"></a>
 ### C010 — 删除无引用的零字节资源
@@ -385,9 +403,99 @@ validation_status: RUNTIME_CHECKED
 validation_refs: [V005, H006]
 ```
 
-删除 template/tile/GrassWindNoise.tres：旧 Git 对象大小为 0 字节，没有有效资源内容，当前项目无场景、材质或代码引用。实际草风由 low_poly.gdshader 直接计算。空 .tres 曾在编辑器扫描时触发解析错误；本次删除后重新导入通过。没有修改草风着色器或参数。
+删除 template/tile/GrassWindNoise.tres：旧 Git 对象大小为 0 字节，没有有效资源内容，当前项目无场景、材质或代码引用。删除空资源时草风由 low_poly.gdshader 直接计算；之后 C011/C013 将 Grass 风动迁入专用材质。空 .tres 曾在编辑器扫描时触发解析错误；本次删除后重新导入通过。没有修改草风着色器或参数。
 
 该文件已不存在，因此净差异索引用删除状态和仓库相对路径记录；旧内容可从父提交查询。它是独立的资源加载修复，不作为新增天气噪声或素材变更处理。
+
+<a id="c011"></a>
+### C011 — 草原专用材质、受光与阵风
+
+```yaml
+module: grassland_material_and_wind
+origin: THIS_BRANCH
+impact_type: SHARED_INTEGRATION
+requires_extra_approval: false
+approval_status: IN_SCOPE
+approval_refs: [A011, A012, A013]
+source_commits: [e9dafc8001d52878151435bb21b6a749fcdb29c8]
+integration_mode: WITH_DEPENDENCIES
+integration_group: G002
+depends_on: [C001, C002, C012, C013, C014]
+validation_status: RUNTIME_CHECKED
+validation_refs: [V006, H007]
+```
+
+原 Grass 与山地、水面、单位共用 low_poly 分档光照和颜色风带。当前 StylizedMaterials.Create() 仅在 grass=true 时复制 grassland.tres；其他对象继续使用原模板。Tile.GrassColor 从固有草色 (0.48,0.68,0.28) 改为贴图乘法调色 (0.86,0.96,1)，选中补光参数保留。
+
+grassland.fragment() 使用世界 xz 坐标：草冠图两次采样分别提供大片平缓草色和弱笔触，grass_land_noise.tres 的单次采样控制阵风形状。该噪声为 256² 单倍频 Perlin，不决定地表植被分布。light() 使用连续漫反射和简化宽高光。草冠方向、等效叶片受光与高光随 TIME 更新，固有色贴图保持固定，云影继续衰减直接光。
+
+当前阵风参数：强度 0.75，视觉传播速度 0.085 km/s，间距 4.8 km，基础恢复宽度 0.85 km；宽高光强度 0.075。速度用于战术镜头表现，不是实测风速。没有新增地形高度、草叶几何、碰撞、地图格式或玩法规则。已知不足：连续亮带仍显塑料，真实地势起伏和植被疏密尚未实现；17 项工程检查不代表美术验收。
+
+<a id="c012"></a>
+### C012 — 草原天气接收与美术预览
+
+```yaml
+module: grassland_weather_and_preview
+origin: THIS_BRANCH
+impact_type: SHARED_INTEGRATION
+requires_extra_approval: false
+approval_status: IN_SCOPE
+approval_refs: [A011, A012, A013]
+source_commits: [e9dafc8001d52878151435bb21b6a749fcdb29c8]
+integration_mode: WITH_DEPENDENCIES
+integration_group: G002
+depends_on: [C002, C007, C011]
+validation_status: RUNTIME_CHECKED
+validation_refs: [V006, H007]
+```
+
+CloudWeather._enter_tree() 的模板列表新增 grassland.tres，在 C# 创建地块材质副本前绑定天气原点、云时钟和两份世界缓存；_ready() 识别预览中的草地 shader，绑定相同天气资源。StylePreview.Ground 从旧内联草材质改为草原模板，单位继续使用 low_poly。云算法、缓存范围、20 Hz 调度和主场景节点均不因此改变。
+
+H007 检查地图编辑后 Grass 材质重建及缓存／时钟绑定，独立预览绑定亦通过。没有修改 World.cs、项目启动场景、Autoload 或全局运行参数。
+
+<a id="c013"></a>
+### C013 — 删除停用的旧草风
+
+```yaml
+module: legacy_grass_wind_cleanup
+origin: THIS_BRANCH
+impact_type: SHARED_INTEGRATION
+requires_extra_approval: false
+approval_status: IN_SCOPE
+approval_refs: [A012]
+source_commits: [e9dafc8001d52878151435bb21b6a749fcdb29c8]
+integration_mode: WITH_DEPENDENCIES
+integration_group: G002
+depends_on: [C011, C012]
+validation_status: RUNTIME_CHECKED
+validation_refs: [V006, H007]
+```
+
+low_poly.gdshader 删除旧草风的强度、速度、间距、宽度四个 uniform 及颜色风带计算，共 14 行。工厂同步移除旧草风常量和 SetShaderParameter() 赋值。旧共享材质的山地、水面、单位风强度原为 0，相关分档光照、颜色、云影和雾保持原样；共享 include 的 grass_wind_direction 仍供云与新草原使用。
+
+第一版草原工作区中未提交的 grass_normal_noise.tres 已删除，其专用采样、旧草和湿土混色均被替换，没有为已废弃的试验保留分支。该资源从未进入本分支 Git 历史，因此不计为起点净差异中的删除文件。
+
+<a id="c014"></a>
+### C014 — 生图草冠资产与导入设置
+
+```yaml
+module: grassland_painted_assets
+origin: THIS_BRANCH
+impact_type: MODULE_LOCAL
+requires_extra_approval: false
+approval_status: IN_SCOPE
+approval_refs: [A013]
+source_commits: [e9dafc8001d52878151435bb21b6a749fcdb29c8]
+integration_mode: WITH_DEPENDENCIES
+integration_group: G002
+depends_on: [C011]
+validation_status: RUNTIME_CHECKED
+validation_refs: [V006, H007]
+```
+
+新增 grassland_canopy.png、.png.import 和 .md 素材说明。内置 imagegen 根据用户认可的草原概念图制作 1254² RGB 源图；PNG 保留生成结果，提示词与限制随仓库共享。导入时限制到 1024 并生成 mipmap，不引入插件或新的工具链依赖。
+
+64 km 跨度的第 4 级 mip 提供缓慢色块，同图的较小尺度镜像采样提供弱笔触明暗。当前棋盘与 40×40 km 预览平面的大色块坐标处于单张图范围内；素材未认证为严格无缝图。贴图不含可交互地形／水文数据，草浪不滚动该图，也不能据此推断已经实现概念图的地形体积。
 
 <a id="commits"></a>
 ## 提交索引
@@ -404,8 +512,10 @@ validation_refs: [V005, H006]
 | `08515f05f49fa0ea771b39f145d97514132cd6a2` | perf: update clouds independently and simplify cache setup | C001、C002、C003、C005、C007、C008 |
 | `6615014bc73055978033dd846223232ac9711c52` | docs: update cloud branch report for independent cadence | REPORT_ONLY；云更新和整理的报告 |
 | `2cbfa3975b6de1f296b2a6ebcbca2d8bedc136f4` | fix: release detached skills and remove empty resource | C009、C010；独立质量修复 |
+| `8696b8b6e94a85e84835790db9013556436e546e` | docs: record skill lifecycle and resource fixes | REPORT_ONLY；上一轮质量修复报告 |
+| `e9dafc8001d52878151435bb21b6a749fcdb29c8` | feat: add painted wet-season grassland prototype | C011～C014、C005；草原代码与素材 |
 
-固定起点为 `d6b1545b527bd8165b8a6c1e8b4817ec695828bc`。代码核对点范围内共 10 次提交，0 次合并提交；本次推送前观察的远端云分支为 `6615014bc73055978033dd846223232ac9711c52`，目标主支仍为固定起点。更新本报告的后续独立文档提交属于 REPORT_ONLY，保留上述 reviewed_commit，不要求报告记录包含自身内容的未知哈希。
+固定起点仍为 `d6b1545b527bd8165b8a6c1e8b4817ec695828bc`。代码核对点范围内共 12 次提交、0 次合并；推送前远端开发分支为 `8696b8b6e94a85e84835790db9013556436e546e`，目标 master 经 ls-remote 核对仍等于固定起点。当前没有合并或重写历史；本报告自身的后续 REPORT_ONLY 提交不要求记录未知的自身哈希。
 
 <a id="approvals"></a>
 ## 授权证据索引
@@ -442,12 +552,24 @@ validation_refs: [V005, H006]
 <a id="a010"></a>
 **A010 — 对剩余两项差异按改进价值处理并推送。** 来源：同一任务，2026-10-20 最新用户消息。用户在已经看到 Piece.cs 技能释放与空资源删除的具体说明后，要求：“如果不是业务代码那就撤销，如果是改进那就推送”。本轮核对两项均有实际修复作用，保留原差异并单独提交／推送，未增加其他实现或项目设置变化。
 
+<a id="a011"></a>
+**A011 — 草原 demo 实施。** 来源：当前草原任务，2026-10-20 本地用户消息。原话：“这个概念图效果还不错，你可以先按照这个方案先做了试试，注意性能优化，这毕竟只是一个demo”。覆盖草原材质、风动、资源和必要的共用接线，不授权项目全局设置或玩法变化。
+
+<a id="a012"></a>
+**A012 — 第二版修订与旧代码清理。** 来源：同一任务。原话：“按照你的思路再做一版，旧版的代码如果没用就删了”。同时要求雨季草原青翠，指出第一版灰暗、脏和草浪不明显；覆盖材质修订和确认停用的旧草风清理。
+
+<a id="a013"></a>
+**A013 — 以概念图画感为方向使用生图美术资产。** 来源：同一任务。用户认可概念图的油画感、清晰色彩与光影，并说：“而且不一定要随机生成啊，可以考虑通过生图功能制作美术资产啊”。覆盖本次生成并接入草冠 PNG，不等同于修改地形高度、渲染模式或新增第三方插件。
+
+<a id="a014"></a>
+**A014 — 保存并推送当前草原版本。** 来源：同一任务，2026-10-20 最新用户消息。原话：“先把这一版push了”。用户同时指出细节、地势起伏、植被疏密仍不足，草浪太塑料，并要求讨论改进看法。授权当前版本的必要提交、报告更新与推送，不把推送理解为美术验收或继续实现新地形的授权。
+
 <a id="validation"></a>
 ## 验证与证据索引
 
 | 编号 | 类型与可访问范围 | 实际核对内容 | 结论边界 |
 | --- | --- | --- | --- |
-| V001 | CURRENT_STATIC；仓库可复核 | 固定基准至代码核对点的 25 个非报告文件、1077/167 行、10 次提交；完整路径另包含报告自身。 | 确认范围、接线和统计，不等于完整运行验收。 |
+| V001 | CURRENT_STATIC；仓库可复核 | 固定基准至本次代码核对点的 34 个非报告文件、文本 1275/184 行、12 次提交，另有 1 个二进制素材；完整路径另含报告自身。 | 确认范围、接线和统计，不等于完整运行验收。 |
 | V002 | HISTORICAL_STATIC + LOCAL_ARTIFACT | 初版报告核对过的六份旧核心源码及当时项目配置，旧哈希保留如下。 | 属于 7d3d951 版本，不再声称与当前已改源码逐字节相同。 |
 | V003 | CURRENT_GIT_CHECK | AGENTS.md 命中根忽略规则，未被跟踪；ab989dd 仅改 .gitignore。 | 忽略和提交范围，不包含游戏行为验证。 |
 | V004 | HISTORICAL_STATIC + LOCAL_ARTIFACT | 待提交源码与 H004/H005 的对应记录核对；project.godot 与起点逐字节相同。最终 cloud_optics 仅移除记录版本末尾一个多余空行，去除末尾空白后文本相同。H005 所查积分和合成函数内容、参数名／类型／默认值保持一致。 | 这是上一轮云版本推送准备的源码核对；当时没有重新运行游戏。本轮 C009/C010 的新验证另见 V005。 |
@@ -456,8 +578,10 @@ validation_refs: [V005, H006]
 | H003 | HISTORICAL_RUNTIME_RECORD；LOCAL_ARTIFACT | 高度版本：最近景淡出、缩放不改物理云影、内部演化和层间遮光，4 次运行退出码 0。 | 当时项目默认 60 FPS；不是本次恢复设置后的结果。 |
 | H004 | IMPLEMENTATION_RUNTIME_RECORD；LOCAL_ARTIFACT | 独立更新阶段 12 项检查通过，静止／平移云时钟约 20.3 Hz、场景约 165.4／164.5 FPS；缓存外、云内高物体和 resize 检查通过。 | 清理前版本，后续差异由 H005 复核；原始材料未随仓库共享。 |
 | H005 | IMPLEMENTATION_RUNTIME_RECORD；LOCAL_ARTIFACT | 清理后 12 项检查通过；size 8/20/30/40 清理前后逐像素一致；静止／平移场景约 165.5／164.4 FPS，云约 20.3 Hz，云体纹理继续变化。1280×720 缓存与直接积分全图平均 RGB 差约 0.034/255。 | Godot 4.6.1 Mono、GL Compatibility、1920×1080、RTX 3060 Laptop；Engine.max_fps=0、原有 VSync 开启。隔离副本，复用已有 C# 程序集，含本地 Piece 修复，未证明纯提交版完整运行。 |
-| V005 | CURRENT_RUNTIME + LOCAL_ARTIFACT | 隔离副本中 95 个生产文件与 `2cbfa39` 逐字节对应，另加独立测试 harness；构建 0 警告、0 错误，资源导入成功，实际 GL Compatibility 演示运行 120 帧成功，三类生命周期检查全部通过，每类检查 14 个技能节点。日志无 ERROR、WARNING、泄漏或 CHECK FAIL。 | Godot 4.6.1 Mono、.NET SDK 8.0.426；运行用 1920×1080，测试副本包含暖机后的生命周期场景。测试脚本不进入产品提交；不等同于全部玩法或其他设备验收。 |
-| H006 | CURRENT_RUNTIME_RECORD；LOCAL_ARTIFACT | V005 对应的本轮构建、导入、演示及生命周期日志和源码快照。 | 原始文件只在本机，摘要与哈希如下；报告更新本身在代码验证之后完成。 |
+| V005 | HISTORICAL_RUNTIME + LOCAL_ARTIFACT | 隔离副本中 95 个生产文件与 `2cbfa39` 逐字节对应，另加独立测试 harness；构建 0 警告、0 错误，资源导入成功，实际 GL Compatibility 演示运行 120 帧成功，三类生命周期检查全部通过，每类检查 14 个技能节点。日志无 ERROR、WARNING、泄漏或 CHECK FAIL。 | Godot 4.6.1 Mono、.NET SDK 8.0.426；运行用 1920×1080，测试副本包含暖机后的生命周期场景。测试脚本不进入产品提交；不等同于全部玩法或其他设备验收。 |
+| H006 | HISTORICAL_RUNTIME_RECORD；LOCAL_ARTIFACT | V005 对应的质量修复阶段构建、导入、演示及生命周期日志和源码快照。 | 原始文件只在本机，摘要与哈希如下；报告更新本身在代码验证之后完成。 |
+| V006 | CURRENT_STATIC；仓库可复核 | 本次代码提交的 13 个草原文件与 H007 测试副本逐字节相同；原 PNG 与生图输出一致。核对固定起点、远端指针、净差异索引、依赖与本地排除项；git diff --check 通过。 | 本次 push 准备没有重跑游戏，不将上轮运行改写为本轮运行；未提交的 SDK 差异单列。 |
+| H007 | IMPLEMENTATION_RUNTIME_RECORD；LOCAL_ARTIFACT | 草原第二版实施阶段构建 0 警告／0 错误，资源导入成功，17 项检查通过，运行日志无错误；三档视距 V1/V2 对照和草浪实录已生成。 | Godot 4.6.3 Mono、GL Compatibility、1920×1080、RTX 3060 Laptop，VSync=1、max_fps=0；测试副本使用本地 SDK 4.6.3，仓库声明仍为 4.6.1，未证明纯提交版在 4.6.1 工具链上运行通过。 |
 
 V002 历史源码 SHA-256（旧核对点 7d3d951；并非当前 reviewed_commit）：
 
@@ -501,40 +625,67 @@ H003 的近／远景 GPU 总耗时约 8.9/11.6 ms，属于旧 60 FPS 上限条�
 
 版本一致性：H004/H005 当时使用的 Piece.cs 修复在那次云推送中仍被排除，现由 A010 授权作为 C009 纳入分支。V005 的生产源码已核对到本轮代码提交，只有隔离测试脚本额外加入；旧记录仍保留原版本与条件，不反推全部玩法、其他设备或合作者分支已回归通过。
 
+H007 工程检查包含：草／山材质选择、编辑重建后的天气绑定、342 个 Grass 材质数量、非草对象保持原 shader、两张草原纹理共享、草冠图确为项目资产且运行时 1024²／带 mipmap、旧草风及旧法线资源删除、固定云时钟时录制草浪、云保持约 20 Hz、独立预览材质和云缓存绑定。视觉实录只证明当前表现可供查看；用户已指出其塑料感和缺少地势层次，不作美术验收结论。
+
+H007 同进程主视口 GPU 数据（缓存冻结，180 帧；不含云缓存耗时）：
+
+| 正交 size | V1 中位数 ms | V2 中位数 ms | V2 P95 ms | V1/V2 绘制次数 |
+| --- | --- | --- | --- | --- |
+| 8 | 0.690 | 0.542 | 1.526 | 719 / 719 |
+| 20 | 1.207 | 0.689 | 2.060 | 1539 / 1539 |
+| 40 | 0.569 | 0.553 | 1.653 | 1617 / 1617 |
+
+开启正常云更新后的场景约 165.5 FPS、云时钟 20.0 Hz。受当前 VSync 和 GPU 动态频率影响，不以中位数宣称稳定加速；V2 P95 高于 V1，保留实际记录。没有为了数据改变项目设置。当前草原每片元 3 次专用纹理采样，无新增草叶几何、视口或绘制次数。
+
+H007 证据仅本机可访问，未将完整日志、隔离副本和动画放入仓库。材料名与 SHA-256：
+
+| 材料 | SHA-256 |
+| --- | --- |
+| `grassland-v2/runtime-validation.json` | `448a332160d76673fe87dd5facc5651c7130f5eaa947da2385e0e80400f264a2` |
+| `grassland-v2/final-source-check.json` | `81a8a9b0eb7efc3066d6ea76083d3bf67ad8c64ff270336fc91d6701637e50df` |
+| `grassland-v2/painted-final-stdout.log` | `33f0e708c72505cd956ad3a58186e560e9f88d73b755fa4fb0bf049e690ea9ec` |
+| `grassland-v2/painted-final-stderr.log` | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+
+草原代码与素材的内容已通过 V006 对照 H007；仓库 .csproj 仍声明 Godot.NET.Sdk/4.6.1、net8.0。本机 4.6.3 声明与忽略规则是原有工作区改动，本次不提交，不能将其算入代码兼容或安装验证。
+
 <a id="collaboration"></a>
 ## 合作接入检查与范围限制
 
 | 检查项 | 已确认事实 | 后续接入要求 |
 | --- | --- | --- |
-| 玩法与数据 | 新增 C009 的共用 Piece 生命周期清理与 C010 的空资源删除；.csproj、.sln、Map/、world/UI/ 和业务规则没有改动。 | 本轮已复核技能释放、面板切换和单位死亡；其他完整玩法仍按目标版本验收。 |
-| 项目与依赖 | project.godot 与固定起点逐字节一致；渲染模式、SDK 与依赖未改。 | 若对方更换投影、渲染方式或模型高度，重新核对云显示假设。 |
-| 共用材质 | 云影路径和云时钟绑定变化，其他地表公式保持原样。 | 核对共享 uniform、噪声和初始化时序，不能仅按文本无冲突判断。 |
-| 世界缓存范围 | 仍固定，范围外直接计算；没有改成相机跟随。 | 保持 A002 的暂缓边界；C007 的屏幕视线缓存另行随相机更新。 |
-| 动态参数 | 模板、接收材质和三份缓存存在初始化复制关系。 | 增加动态天气／太阳控制时同步全部消费者。 |
-| 目标主支 | 推送前 fetch 后仍等于固定起点。 | 未来主支更新时保留固定起点，记录同步来源并重核兼容。 |
-| 帧率条件 | 云主要计算约 20 Hz；缩放／旋转等会强制刷新云体。 | 实际显示帧率受原有 VSync、硬件及场景影响，不视作全局帧率保证。 |
+| 玩法与数据 | 既有 C009/C010 修复保留；新增草原只改显示材质和资源，Map/、World.cs、碰撞、战斗与地图格式不改。 | 高度与单位贴地、描边适配尚未实现，不当作已有能力。 |
+| 项目与依赖 | project.godot 与固定起点逐字节一致；提交中的 SDK 仍为 4.6.1。H007 用本地 4.6.3 环境，差异明确排除。 | 原声明工具链及其他设备需要对应验证，不默认继承本机结果。 |
+| 共用材质 | Grass 改用专用模板；山、水、单位仍用 low_poly；旧草风由 C013 删除。 | 接入 G002 时连同工厂、接收绑定、资源和预览引入。 |
+| 世界缓存范围 | 仍固定，范围外直接计算；没有相机跟随世界缓存。 | 保持 A002 暂缓边界，屏幕视线缓存仍由 C007 随相机变化。 |
+| 动态参数 | 草原模板在初始化时接收同一云资源；后续动态参数仍需同步消费者。 | 不默认已有自动传播全部天气参数的接口。 |
+| 目标主支 | 本次 ls-remote 核对 origin/master 仍为固定起点；未合并主支。 | 目标主支变化时重新核对兼容性。 |
+| 画面与帧率 | 原生 TIME 草浪、云约 20 Hz，工程接线已检查；当前草浪塑料感和缺少起伏是用户已指出的问题。 | 美术效果尚待继续迭代，不能用 17 项检查替代视觉验收。 |
 
 <a id="local-only"></a>
 ## 本地排除项与报告自身
 
 | 项目 | 核对状态／归属 | 处理 |
 | --- | --- | --- |
-| AGENTS.md | IGNORED | 正文未跟踪，继续只保留本地。 |
-| docs/branch-reports/codex-realistic-clouds.md | REPORT_ONLY；UPDATED_NOT_USER_REVIEWED | 本次按 A010 更新并独立提交，代码核对点为 2cbfa39。 |
+| AGENTS.md | IGNORED | 未跟踪，只保留本地，不提交。 |
+| .gitignore 工作区差异 | LOCAL_ONLY | 原有两行本地工具链忽略规则，本次保留且不暂存；分支原有 AGENTS.md 忽略条目继续有效。 |
+| 陷阵.csproj 工作区差异 | LOCAL_ONLY | 原有 Godot.NET.Sdk/4.6.1 → 4.6.3，本次不提交，不更改仓库声明。 |
+| 陷阵.csproj.old / 陷阵.csproj.old.1 | IGNORED / UNTRACKED；LOCAL_ONLY | 原有工具链备份，保留，不清理、不提交。 |
+| docs/branch-reports/codex-realistic-clouds.md | REPORT_ONLY；UPDATED_NOT_USER_REVIEWED | 按 A014 更新后单独提交，reviewed_commit 记录本次实际草原代码提交。 |
 
-此前列作本地排除项的 Piece.cs 和 GrassWindNoise.tres 差异，现已按 A010 作为 C009/C010 提交；不再记为未提交现场。本次没有纳入其他工作区内容，测试脚本、日志和隔离副本均不进入 Git。
+草原代码与资源净变化计入 C011～C014；第一版未提交的旧法线资源删除不伪装成历史删除项。实现测试脚本、日志、动画和隔离副本均保留在本机，不进入 Git。原有 .gitignore、.csproj、未跟踪备份和地图通过哈希确认未被本次修改覆盖。
 
 <a id="decisions"></a>
 ## 待决定事项与报告更新
 
 | 事项 | 当前状态 | 下一步 |
 | --- | --- | --- |
-| 初版报告审阅 | USER_REVIEWED，A006 | 保留历史审阅事实；本次扩展未被追认成已单独审阅。 |
-| 当前两项改进提交／推送 | EXPLICITLY_APPROVED，A010 | 技能释放和空资源删除已作为独立质量修复提交，更新报告后推送；不包含 AGENTS.md 正文或主分支合并。 |
-| C004 全局帧率策略 | WITHDRAWN，A007 | 当前文件恢复起点，已退出候选，无需再决定保留旧 60 FPS 键。 |
-| 合作者最新模块的兼容 | NOT_ASSESSED | 准备接入对应版本时核对共用文件及参数依赖。 |
-| 当前版本验证 | RUNTIME_CHECKED，V005 | 已完成最新生产源码的隔离构建、导入、120 帧演示及三类生命周期检查；全部玩法与其他设备未包含在本轮验收中。 |
+| 初版报告审阅 | USER_REVIEWED，A006 | 保留历史事实；后续扩展不追认成已单独审阅。 |
+| 当前草原提交／推送 | EXPLICITLY_APPROVED，A014 | 保存现有原型，代码与报告分开提交后推送当前开发分支，不合并主支。 |
+| C004 全局帧率策略 | WITHDRAWN，A007 | project.godot 继续保持起点设置。 |
+| 地势、植被疏密与草浪美术迭代 | UNCONFIRMED | 当前仅讨论后续方向，没有实现新地形或单位贴地接线的授权记录。 |
+| 合作者最新模块的兼容 | UNCONFIRMED | 准备接入明确版本时核对共用文件及参数依赖。 |
+| 当前版本验证 | RUNTIME_CHECKED，H007；本次 V006 为 STATIC_CHECKED | 保留 4.6.3 实现阶段运行与 4.6.1 提交声明的差异，不声称本次重跑或全玩法验收。 |
 
 维护时机：仅在用户明确要求 commit／push 时，在执行前集中汇总实际内容并更新本报告；日常开发、调试、验证和交付不要求同步维护。用户另行要求查看、生成或修订时按其指令处理。
 
-维护时保持 C001～C010 编号及报告路径稳定，新增行为使用新编号，撤回项保留历史并退出候选。reviewed_commit 只承诺已核对代码；后续仅改本报告的 REPORT_ONLY 提交可保留此值，出现其他路径变化时在下一次维护中补充核对。不得把旧运行、旧授权或旧主分支观察值无条件沿用。
+维护时保持 C001～C014 编号及报告路径稳定，新增行为使用新编号，撤回项保留历史并退出候选。reviewed_commit 只承诺已核对代码；后续仅改本报告的 REPORT_ONLY 提交可保留此值，出现其他路径变化时在下一次维护中补充核对。不得把旧运行、旧授权或旧主分支观察值无条件沿用。
