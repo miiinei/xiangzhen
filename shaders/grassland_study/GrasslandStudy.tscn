@@ -1,0 +1,64 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://shaders/grassland_study/GrasslandStudy.gd" id="1"]
+[ext_resource type="Script" path="res://shaders/CloudWeather.gd" id="2"]
+[ext_resource type="Material" path="res://shaders/cloud_layer.tres" id="3"]
+
+[sub_resource type="QuadMesh" id="CloudQuad"]
+size = Vector2(2, 2)
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.52, 0.73, 0.85, 1)
+
+[sub_resource type="StandardMaterial3D" id="GridMaterial"]
+shading_mode = 0
+transparency = 1
+albedo_color = Color(0.8, 0.89, 0.67, 0.4)
+
+[node name="GrasslandStudy" type="Node3D"]
+position = Vector3(16.5, 0, 14.5)
+script = ExtResource("1")
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+
+[node name="ScaleGrid" type="MeshInstance3D" parent="."]
+visible = false
+cast_shadow = 0
+material_override = SubResource("GridMaterial")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8660254, 0.40957603, -0.28678823, 0, 0.57357645, 0.81915206, 0.5, -0.7094065, 0.49673176, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(8, 8, 8)
+rotation_degrees = Vector3(-35.264, 45, 0)
+projection = 1
+size = 12.0
+current = true
+
+[node name="CloudLayer" type="MeshInstance3D" parent="Camera3D"]
+position = Vector3(0, 0, -1)
+cast_shadow = 0
+mesh = SubResource("CloudQuad")
+material_override = ExtResource("3")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")
+
+[node name="CloudWeather" type="Node" parent="."]
+script = ExtResource("2")
+weather_seed = 1729
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Caption" type="Label" parent="CanvasLayer"]
+offset_left = 22.0
+offset_top = 18.0
+theme_override_colors/font_color = Color(0.95, 0.98, 0.87, 1)
+theme_override_colors/font_shadow_color = Color(0.04, 0.10, 0.07, 0.8)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 17
